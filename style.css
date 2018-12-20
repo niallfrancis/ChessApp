@@ -1,0 +1,72 @@
+
+#board {
+    width: 480px;
+    height: 480px;
+    position:relative;
+    border-style: solid;
+    border-width: 5px;
+}
+
+.square {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+}
+
+.light {
+    background-color:burlywood;
+}
+
+.dark {
+    background-color:brown;
+}
+
+.rank1 {
+    top: 0px;
+}
+.rank2 {
+    top: 60px;
+}
+.rank3 {
+    top: 120px;
+}
+.rank4 {
+    top: 180px;
+}
+.rank5 {
+    top: 240px;
+}
+.rank6 {
+    top: 300px;
+}
+.rank7 {
+    top: 360px;
+}
+.rank8 {
+    top: 420px;
+}
+
+.file1 {
+    left: 0px;
+}
+.file2 {
+    left: 60px;
+}
+.file3 {
+    left: 120px;
+}
+.file4 {
+    left: 180px;
+}
+.file5 {
+    left: 240px;
+}
+.file6 {
+    left: 300px;
+}
+.file7 {
+    left: 360px;
+}
+.file8 {
+    left: 420px;
+}
