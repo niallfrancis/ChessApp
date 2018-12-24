@@ -9,8 +9,61 @@ boardData = CreateNewBoardData(whitePieces, blackPieces);
 
 });
 
+function Piece(currentPos, colour) {
+  this.currentPos = currentPos;
+  this.colour = colour;
+  Piece.prototype.ShowMoves = function () {};
+}
+
+function Pawn(currentPos, colour) {
+  Piece.call(this, currentPos, colour);
+
+  Pawn.prototype.ShowMoves = function() {
+    var movableSpaces = [];
+    var moveDir = ((this.colour == "white") ? -1 : 1);
+
+    var searchSpace = this.currentPos + (moveDir * 10);
+    if (SpaceIsEmpty(this, searchSpace)) {
+      movableSpaces.push(searchSpace);
+    }
+
+    searchSpace = this.currentPos + (moveDir * 10) + 1;
+    if (SpaceContainsEnemy(this, searchSpace)) {
+      movableSpaces.push(searchSpace);
+    }
+
+    searchSpace = this.currentPos + (moveDir * 10) - 1;
+    if (SpaceContainsEnemy(this, searchSpace)) {
+      movableSpaces.push(searchSpace);
+    }
+
+    return movableSpaces;
 
 
+  };
+
+}
+
+function SpaceIsEmpty(movingPiece, targetSpace) {
+  if (boardData[targetSpace] == 0)
+  {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function SpaceContainsEnemy(movingPiece, targetSpace) {
+  enemySpace = false;
+  //Needs to check if space is not empty
+  if (boardData[targetSpace] != 99 && boardData[targetSpace] != 0) {
+    if (boardData[targetSpace].colour != movingPiece.colour) {
+      enemySpace =  true;
+    }
+  }
+
+  return enemySpace;
+}
 function CreateNewBoardData(whitePieces, blackPieces)
 {
   var boardSize = 120;
