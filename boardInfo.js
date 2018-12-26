@@ -4,6 +4,8 @@ $(document).ready(function () {
 whitePieces = [];
 blackPieces = [];
 
+boardData = CreateNewBoardData(whitePieces, blackPieces);
+
 
 });
 
@@ -41,11 +43,33 @@ function Knight(currentPos, colour) {
 
   Knight.prototype.ShowMoves = function() {
     var movableSpaces = [];
-    //var moveDir = ((this.colour == "white") ? -1 : 1);
     var searchSpace = [-21, -19, 21, 19, 12, -8, -12, 8];
 
     for (var i = 0; i < searchSpace.length; i++) {
       moveSpace = this.currentPos + searchSpace[i];
+      if (SpaceIsEmpty(this, moveSpace) || SpaceContainsEnemy(this, moveSpace)) {
+        movableSpaces.push(moveSpace);
+      }
+    }
+    return movableSpaces;
+  };
+}
+
+function Bishop(currentPos, colour) {
+  Piece.call(this, currentPos, colour);
+
+  Bishop.prototype.ShowMoves = function() {
+    var movableSpaces = [];
+    var searchSpace = [];
+
+    for (var i = 0; i < boardData.length; i++) {
+      if (((i - this.currentPos) % 11 == 0) || ((i - this.currentPos) % 9 == 0)) {
+        searchSpace.push(i);
+      }
+    }
+
+    for (var i = 0; i < searchSpace.length; i++) {
+      moveSpace = searchSpace[i];
       if (SpaceIsEmpty(this, moveSpace) || SpaceContainsEnemy(this, moveSpace)) {
         movableSpaces.push(moveSpace);
       }
