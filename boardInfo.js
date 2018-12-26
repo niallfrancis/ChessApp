@@ -83,6 +83,24 @@ function Queen(currentPos, colour) {
   };
 }
 
+function King(currentPos, colour) {
+  Piece.call(this, currentPos, colour);
+
+  King.prototype.ShowMoves = function() {
+    var movableSpaces = [];
+
+    searchSpace = [1, -1, 10, -10, 9, -11, -9, 11];
+
+    for (var i = 0; i < searchSpace.length; i++) {
+      moveSpace = this.currentPos + searchSpace[i];
+      if (SpaceIsEmpty(this, moveSpace) || SpaceContainsEnemy(this, moveSpace)) {
+        movableSpaces.push(moveSpace);
+      }
+    }
+    return movableSpaces;
+  };
+}
+
 //Set parent class for all pieces
 Pawn.prototype = new Piece();
 
