@@ -1,10 +1,9 @@
+$(document).ready(function() {
 
-$(document).ready(function () {
+  whitePieces = [];
+  blackPieces = [];
 
-whitePieces = [];
-blackPieces = [];
-
-boardData = CreateNewBoardData(whitePieces, blackPieces);
+  boardData = CreateNewBoardData(whitePieces, blackPieces);
 
 
 });
@@ -12,7 +11,7 @@ boardData = CreateNewBoardData(whitePieces, blackPieces);
 function Piece(currentPos, colour) {
   this.currentPos = currentPos;
   this.colour = colour;
-  Piece.prototype.ShowMoves = function () {};
+  Piece.prototype.ShowMoves = function() {};
 }
 
 function Pawn(currentPos, colour) {
@@ -135,7 +134,7 @@ function HorizontalVerticalMovement(piece) {
   var searchSpace = [];
 
   for (var i = 0; i < boardData.length; i++) {
-    if (((i - piece.currentPos) % 10 == 0) || (Math.floor(i/10) == Math.floor(piece.currentPos / 10))) {
+    if (((i - piece.currentPos) % 10 == 0) || (Math.floor(i / 10) == Math.floor(piece.currentPos / 10))) {
       searchSpace.push(i);
     }
   }
@@ -150,8 +149,7 @@ function HorizontalVerticalMovement(piece) {
 }
 
 function SpaceIsEmpty(movingPiece, targetSpace) {
-  if (boardData[targetSpace] == 0)
-  {
+  if (boardData[targetSpace] == 0) {
     return true;
   } else {
     return false;
@@ -163,16 +161,15 @@ function SpaceContainsEnemy(movingPiece, targetSpace) {
   //Needs to check if space is not empty
   if (boardData[targetSpace] instanceof Piece) {
     if (boardData[targetSpace].colour != movingPiece.colour) {
-      enemySpace =  true;
+      enemySpace = true;
     }
   }
 
   return enemySpace;
 }
 
-function CreateNewBoardData(whitePieces, blackPieces)
-{
-  //rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
+function CreateNewBoardData(whitePieces, blackPieces) {
+
   boardData = GenerateFenBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
   return boardData;
 }
@@ -192,7 +189,7 @@ function GenerateFenBoard(fen) {
 
     if (currentChar != "/") {
       if (!isNaN(currentChar)) {
-        for (var j = 0; j < parseInt(currentChar,10); j++) {
+        for (var j = 0; j < parseInt(currentChar, 10); j++) {
           boardSpace[currentSquare] = 0;
           currentSquare++;
         }
