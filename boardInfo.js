@@ -6,7 +6,6 @@ blackPieces = [];
 
 boardData = CreateNewBoardData(whitePieces, blackPieces);
 
-
 });
 
 function Piece(currentPos, colour) {
@@ -43,6 +42,7 @@ function Pawn(currentPos, colour) {
   };
 
 }
+Pawn.prototype = new Piece();
 
 function SpaceIsEmpty(movingPiece, targetSpace) {
   if (boardData[targetSpace] == 0)
@@ -56,7 +56,7 @@ function SpaceIsEmpty(movingPiece, targetSpace) {
 function SpaceContainsEnemy(movingPiece, targetSpace) {
   enemySpace = false;
   //Needs to check if space is not empty
-  if (boardData[targetSpace] != 99 && boardData[targetSpace] != 0) {
+  if (boardData[targetSpace] instanceof Piece) {
     if (boardData[targetSpace].colour != movingPiece.colour) {
       enemySpace =  true;
     }
