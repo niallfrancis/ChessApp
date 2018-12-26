@@ -78,6 +78,29 @@ function Bishop(currentPos, colour) {
   };
 }
 
+function Rook(currentPos, colour) {
+  Piece.call(this, currentPos, colour);
+
+  Rook.prototype.ShowMoves = function() {
+    var movableSpaces = [];
+    var searchSpace = [];
+
+    for (var i = 0; i < boardData.length; i++) {
+      if (((i - this.currentPos) % 10 == 0) || (Math.floor(i/10) == Math.floor(this.currentPos / 10))) {
+        searchSpace.push(i);
+      }
+    }
+
+    for (var i = 0; i < searchSpace.length; i++) {
+      moveSpace = searchSpace[i];
+      if (SpaceIsEmpty(this, moveSpace) || SpaceContainsEnemy(this, moveSpace)) {
+        movableSpaces.push(moveSpace);
+      }
+    }
+    return movableSpaces;
+  };
+}
+
 //Set parent class for all pieces
 Pawn.prototype = new Piece();
 
@@ -112,7 +135,10 @@ function CreateNewBoardData(whitePieces, blackPieces)
     boardSpace[i] = 99;
   }
   for (var i = 1; i <= boardSize; i++) {
-    if (i >= 41 && i <= 78) {
+    if ((i >= 41 && i <= 48) ||
+        (i >= 51 && i <= 58) ||
+        (i >= 61 && i <= 68) ||
+        (i >= 71 && i <= 78)) {
       //Empty starting spots
       boardSpace[i] = 0;
     } else {
