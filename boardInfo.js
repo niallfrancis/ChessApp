@@ -11,11 +11,13 @@ $(document).ready(function() {
 function Piece(currentPos, colour) {
   this.currentPos = currentPos;
   this.colour = colour;
+  this.pieceVal;
   Piece.prototype.ShowMoves = function() {};
 }
 
 function Pawn(currentPos, colour) {
   Piece.call(this, currentPos, colour);
+  this.pieceVal = "Pawn";
 
   Pawn.prototype.ShowMoves = function() {
     var movableSpaces = [];
@@ -39,6 +41,7 @@ function Pawn(currentPos, colour) {
 
 function Knight(currentPos, colour) {
   Piece.call(this, currentPos, colour);
+  this.pieceVal = "Knight";
 
   Knight.prototype.ShowMoves = function() {
     var movableSpaces = [];
@@ -56,6 +59,7 @@ function Knight(currentPos, colour) {
 
 function Bishop(currentPos, colour) {
   Piece.call(this, currentPos, colour);
+  this.pieceVal = "Bishop";
 
   Bishop.prototype.ShowMoves = function() {
     return DiagonalMovement(this);
@@ -64,6 +68,7 @@ function Bishop(currentPos, colour) {
 
 function Rook(currentPos, colour) {
   Piece.call(this, currentPos, colour);
+  this.pieceVal = "Rook";
 
   Rook.prototype.ShowMoves = function() {
     return HorizontalVerticalMovement(this);
@@ -72,6 +77,7 @@ function Rook(currentPos, colour) {
 
 function Queen(currentPos, colour) {
   Piece.call(this, currentPos, colour);
+  this.pieceVal = "Queen";
 
   Queen.prototype.ShowMoves = function() {
     var movableSpaces = [];
@@ -84,6 +90,7 @@ function Queen(currentPos, colour) {
 
 function King(currentPos, colour) {
   Piece.call(this, currentPos, colour);
+  this.pieceVal = "King";
 
   King.prototype.ShowMoves = function() {
     var movableSpaces = [];

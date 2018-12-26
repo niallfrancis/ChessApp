@@ -7,6 +7,55 @@
     border-width: 5px;
 }
 
+.white.Pawn {
+  content:url(images/whitePawn.png);
+}
+
+.white.Knight {
+  content:url(images/whiteKnight.png);
+}
+
+.white.Bishop {
+  content:url(images/whiteBishop.png);
+}
+
+.white.Rook {
+  content:url(images/whiteRook.png);
+}
+
+.white.Queen {
+  content:url(images/whiteQueen.png);
+}
+
+.white.King {
+  content:url(images/whiteKing.png);
+}
+
+
+.black.Pawn {
+  content:url(images/blackPawn.png);
+}
+
+.black.Knight {
+  content:url(images/blackKnight.png);
+}
+
+.black.Bishop {
+  content:url(images/blackBishop.png);
+}
+
+.black.Rook {
+  content:url(images/blackRook.png);
+}
+
+.black.Queen {
+  content:url(images/blackQueen.png);
+}
+
+.black.King {
+  content:url(images/blackKing.png);
+}
+
 .square {
     position: absolute;
     width: 60px;
