@@ -4,7 +4,6 @@ $(document).ready(function () {
 whitePieces = [];
 blackPieces = [];
 
-boardData = CreateNewBoardData(whitePieces, blackPieces);
 
 });
 
@@ -20,28 +19,42 @@ function Pawn(currentPos, colour) {
   Pawn.prototype.ShowMoves = function() {
     var movableSpaces = [];
     var moveDir = ((this.colour == "white") ? -1 : 1);
-
     var searchSpace = this.currentPos + (moveDir * 10);
+
     if (SpaceIsEmpty(this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
-
     searchSpace = this.currentPos + (moveDir * 10) + 1;
     if (SpaceContainsEnemy(this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
-
     searchSpace = this.currentPos + (moveDir * 10) - 1;
     if (SpaceContainsEnemy(this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
-
     return movableSpaces;
-
-
   };
-
 }
+
+function Knight(currentPos, colour) {
+  Piece.call(this, currentPos, colour);
+
+  Knight.prototype.ShowMoves = function() {
+    var movableSpaces = [];
+    //var moveDir = ((this.colour == "white") ? -1 : 1);
+    var searchSpace = [-21, -19, 21, 19, 12, -8, -12, 8];
+
+    for (var i = 0; i < searchSpace.length; i++) {
+      moveSpace = this.currentPos + searchSpace[i];
+      if (SpaceIsEmpty(this, moveSpace) || SpaceContainsEnemy(this, moveSpace)) {
+        movableSpaces.push(moveSpace);
+      }
+    }
+    return movableSpaces;
+  };
+}
+
+//Set parent class for all pieces
 Pawn.prototype = new Piece();
 
 function SpaceIsEmpty(movingPiece, targetSpace) {
