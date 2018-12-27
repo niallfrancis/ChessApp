@@ -63,13 +63,17 @@
 }
 
 .light {
-    background-color:burlywood;
+    background-color:#f7f7f7;
 }
 
 .dark {
-    background-color:brown;
+    background-color:#3a3e59;
 }
 
+.movable {
+  background-color: #706d6d;
+
+}
 .rank1 {
     top: 0px;
 }
