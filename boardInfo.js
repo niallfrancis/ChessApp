@@ -8,11 +8,19 @@ $(document).ready(function() {
 
 });
 
+
+
 function Piece(currentPos, colour) {
   this.currentPos = currentPos;
   this.colour = colour;
   this.pieceVal;
   Piece.prototype.ShowMoves = function() {};
+  Piece.prototype.Move = function(targetSpace) {
+    var tempPos = this.currentPos;
+    this.currentPos = targetSpace;
+    boardData[targetSpace] = this;
+    boardData[tempPos] = 0;
+  };
 }
 
 function Pawn(currentPos, colour) {
@@ -22,16 +30,16 @@ function Pawn(currentPos, colour) {
   Pawn.prototype.ShowMoves = function() {
     var movableSpaces = [];
     var moveDir = ((this.colour == "white") ? -1 : 1);
-    var searchSpace = this.currentPos + (moveDir * 10);
+    var searchSpace = parseInt(this.currentPos) + (moveDir * 10);
 
     if (SpaceIsEmpty(this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
-    searchSpace = this.currentPos + (moveDir * 10) + 1;
+    searchSpace = parseInt(this.currentPos) + (moveDir * 10) + 1;
     if (SpaceContainsEnemy(this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
-    searchSpace = this.currentPos + (moveDir * 10) - 1;
+    searchSpace = parseInt(this.currentPos) + (moveDir * 10) - 1;
     if (SpaceContainsEnemy(this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
@@ -48,7 +56,7 @@ function Knight(currentPos, colour) {
     var searchSpace = [-21, -19, 21, 19, 12, -8, -12, 8];
 
     for (var i = 0; i < searchSpace.length; i++) {
-      moveSpace = this.currentPos + searchSpace[i];
+      moveSpace = parseInt(this.currentPos) + searchSpace[i];
       if (SpaceIsEmpty(this, moveSpace) || SpaceContainsEnemy(this, moveSpace)) {
         movableSpaces.push(moveSpace);
       }
@@ -98,7 +106,7 @@ function King(currentPos, colour) {
     searchSpace = [1, -1, 10, -10, 9, -11, -9, 11];
 
     for (var i = 0; i < searchSpace.length; i++) {
-      moveSpace = this.currentPos + searchSpace[i];
+      moveSpace = parseInt(this.currentPos) + searchSpace[i];
       if (SpaceIsEmpty(this, moveSpace) || SpaceContainsEnemy(this, moveSpace)) {
         movableSpaces.push(moveSpace);
       }
@@ -119,19 +127,24 @@ King.prototype = new Piece();
 function DiagonalMovement(piece) {
   var movableSpaces = [];
   var searchSpace = [];
+  var directions = [11, 9, -11, -9];
 
-  for (var i = 0; i < boardData.length; i++) {
-    if (((i - piece.currentPos) % 11 == 0) || ((i - piece.currentPos) % 9 == 0)) {
-      searchSpace.push(i);
+  for (var i = 0; i < directions.length; i++) {
+    searching = true;
+    var tempSpace = piece.currentPos;
+    while (searching) {
+      tempSpace -= directions[i];
+      if (SpaceIsEmpty(piece,tempSpace)) {
+        movableSpaces.push(tempSpace);
+      }else if (SpaceContainsEnemy(piece,tempSpace)) {
+        movableSpaces.push(tempSpace);
+        searching = false;
+      } else {
+        searching = false;
+      }
     }
   }
 
-  for (var i = 0; i < searchSpace.length; i++) {
-    moveSpace = searchSpace[i];
-    if (SpaceIsEmpty(piece, moveSpace) || SpaceContainsEnemy(piece, moveSpace)) {
-      movableSpaces.push(moveSpace);
-    }
-  }
   return movableSpaces;
 }
 
@@ -139,19 +152,38 @@ function DiagonalMovement(piece) {
 function HorizontalVerticalMovement(piece) {
   var movableSpaces = [];
   var searchSpace = [];
+  var directions = [1, 10, -1, -10];
 
-  for (var i = 0; i < boardData.length; i++) {
-    if (((i - piece.currentPos) % 10 == 0) || (Math.floor(i / 10) == Math.floor(piece.currentPos / 10))) {
-      searchSpace.push(i);
+  for (var i = 0; i < directions.length; i++) {
+    searching = true;
+    var tempSpace = piece.currentPos;
+    while (searching) {
+      tempSpace -= directions[i];
+      if (SpaceIsEmpty(piece,tempSpace)) {
+        movableSpaces.push(tempSpace);
+      }else if (SpaceContainsEnemy(piece,tempSpace)) {
+        movableSpaces.push(tempSpace);
+        searching = false;
+      } else {
+        searching = false;
+      }
     }
   }
 
-  for (var i = 0; i < searchSpace.length; i++) {
-    moveSpace = searchSpace[i];
-    if (SpaceIsEmpty(piece, moveSpace) || SpaceContainsEnemy(piece, moveSpace)) {
-      movableSpaces.push(moveSpace);
-    }
-  }
+
+
+  // for (var i = 0; i < boardData.length; i++) {
+  //   if (((i - piece.currentPos) % 10 == 0) || (Math.floor(i / 10) == Math.floor(piece.currentPos / 10))) {
+  //     searchSpace.push(i);
+  //   }
+  // }
+  //
+  // for (var i = 0; i < searchSpace.length; i++) {
+  //   moveSpace = searchSpace[i];
+  //   if (SpaceIsEmpty(piece, moveSpace) || SpaceContainsEnemy(piece, moveSpace)) {
+  //     movableSpaces.push(moveSpace);
+  //   }
+  // }
   return movableSpaces;
 }
 

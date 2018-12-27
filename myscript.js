@@ -1,8 +1,35 @@
 $(document).ready(function () {
+  var selectedPiece = null;
     InitBoard();
-    console.log(boardData);
     DrawPieces(boardData);
+
+
+    $(".square").click(function(event) {
+      var boardId = $(this).attr('id');
+      var moved = false;
+
+      if (selectedPiece != null) {
+        if ($(this).hasClass('movable')) {
+          selectedPiece.Move(boardId);
+          DrawPieces(boardData);
+          moved = true;
+        }
+        selectedPiece = null;
+        ResetBoard();
+      }
+      if (this.hasChildNodes() && !moved) {
+        selectedPiece = boardData[boardId];
+        moveableSpaces = selectedPiece.ShowMoves();
+        for (var i = 0; i < moveableSpaces.length; i++) {
+          var tempSpace = $(".square#" + moveableSpaces[i] +"");
+          tempSpace.addClass('movable');
+        }
+      }
+
+    });
 });
+
+
 
  function DrawPieces(boardData) {
    var squares = $(".square");
@@ -10,6 +37,7 @@ $(document).ready(function () {
 
    for (var i = 0; i < boardData.length; i++) {
      if (boardData[i] != 99) {
+       $(".square").eq(currentSquare).empty()
        if (boardData[i] != 0) {
          image = "<img class=\"piece " + boardData[i].colour + " " + boardData[i].pieceVal  + "\"/>";
          $(".square").eq(currentSquare).append(image);
@@ -42,4 +70,20 @@ function InitBoard() {
 
         }
     }
+
+    var currentSquare = 0;
+    for (var i = 0; i < boardData.length; i++) {
+      if (boardData[i] != 99) {
+        $(".square:eq("+currentSquare+")").attr('id', ''+ i + '');
+        currentSquare++;
+      }
+    }
+}
+
+function ResetBoard() {
+  var allSquares = $(".square");
+
+  for (var i = 0; i < allSquares.length; i++) {
+    $(".square:eq("+i+")").removeClass('movable');
+  }
 }
