@@ -1,14 +1,11 @@
 $(document).ready(function() {
 
-  whitePieces = [];
-  blackPieces = [];
+  var whitePieces = [];
+  var blackPieces = [];
 
   boardData = CreateNewBoardData(whitePieces, blackPieces);
 
-
 });
-
-
 
 function Piece(currentPos, colour) {
   this.currentPos = currentPos;

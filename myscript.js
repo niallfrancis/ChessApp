@@ -1,32 +1,38 @@
 $(document).ready(function () {
   var selectedPiece = null;
-    InitBoard();
-    DrawPieces(boardData);
+  var whiteTurn = true;
+  InitBoard();
+
+  DrawPieces(boardData);
 
 
-    $(".square").click(function(event) {
-      var boardId = $(this).attr('id');
-      var moved = false;
+  $(".square").click(function(event) {
+    var boardId = $(this).attr('id');
+    var moved = false;
 
-      if (selectedPiece != null) {
-        if ($(this).hasClass('movable')) {
-          selectedPiece.Move(boardId);
-          DrawPieces(boardData);
-          moved = true;
-        }
-        selectedPiece = null;
-        ResetBoard();
+    if (selectedPiece != null) {
+      if ($(this).hasClass('movable')) {
+        selectedPiece.Move(boardId);
+        DrawPieces(boardData);
+        moved = true;
+        whiteTurn = !whiteTurn;
       }
-      if (this.hasChildNodes() && !moved) {
-        selectedPiece = boardData[boardId];
+      selectedPiece = null;
+      ResetBoard();
+    }
+    if (this.hasChildNodes() && !moved) {
+      selectedPiece = boardData[boardId];
+      if ((selectedPiece.colour == "white") == whiteTurn) {
         moveableSpaces = selectedPiece.ShowMoves();
         for (var i = 0; i < moveableSpaces.length; i++) {
           var tempSpace = $(".square#" + moveableSpaces[i] +"");
           tempSpace.addClass('movable');
         }
+      } else {
+        selectedPiece = null;
       }
-
-    });
+    }
+  });
 });
 
 
