@@ -38,7 +38,7 @@ function Pawn(currentPos, colour) {
 
     var searchSpace = parseInt(this.currentPos) + (moveDir * 20);
 
-    if (SpaceIsEmpty(board, this, searchSpace) && this.previousPos == undefined) {
+    if (SpaceIsEmpty(board, this, searchSpace) && SpaceIsEmpty(board, this, searchSpace - (moveDir * 10)) && this.previousPos == undefined) {
       movableSpaces.push(searchSpace);
     }
     searchSpace = parseInt(this.currentPos) + (moveDir * 10) + 1;
