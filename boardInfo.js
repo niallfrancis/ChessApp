@@ -81,8 +81,13 @@ function Pawn(currentPos, colour) {
     if (this.previousPos == undefined) {
       enPassantSpace = this.currentPos;
     }
+    if (targetSpace <= 29 || targetSpace >= 91) {
+      console.log("test");
+      board[targetSpace] = new Queen(targetSpace, this.colour);
+    } else {
+      board[targetSpace] = this;
+    }
     this.previousPos = tempPos;
-    board[targetSpace] = this;
     board[tempPos] = 0;
   };
 }

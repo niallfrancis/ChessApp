@@ -114,9 +114,3 @@ QUnit.test("Test Checkmate", function(assert) {
   testBoard[98].Move(94,testBoard);
   assert.ok(testBoard[54].isCheckmated,"King is in checkmate");
 });
-
-QUnit.jUnitDone(function(report) {
-  if (typeof console !== 'undefined') {
-    console.log(report.xml);
-  }
-});
