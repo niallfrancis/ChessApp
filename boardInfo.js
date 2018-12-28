@@ -11,7 +11,7 @@ $(document).ready(function() {
 
 function Piece(currentPos, colour) {
   this.currentPos = currentPos;
-  this.previousPos;
+  this.previousPos = null;
   this.colour = colour;
   this.pieceVal;
   Piece.prototype.ShowMoves = function(board) {};
@@ -39,9 +39,7 @@ function Pawn(currentPos, colour) {
     }
 
     var searchSpace = parseInt(this.currentPos) + (moveDir * 20);
-    if (SpaceIsEmpty(board, this, searchSpace)
-        && SpaceIsEmpty(board, this, searchSpace - (moveDir * 10))
-        && this.previousPos == undefined) {
+    if (SpaceIsEmpty(board, this, searchSpace) && SpaceIsEmpty(board, this, searchSpace - (moveDir * 10)) && this.previousPos == undefined) {
       movableSpaces.push(searchSpace);
     }
     searchSpace = parseInt(this.currentPos) + (moveDir * 10) + 1;
@@ -70,7 +68,7 @@ function Pawn(currentPos, colour) {
     var movedPiece;
     if (SpaceContainsEnemy(board, this, targetSpace - (moveDir * 10))) {
       movedPiece = board[targetSpace - (moveDir * 10)];
-      if(movedPiece.currentPos == enPassantSpace) {
+      if (movedPiece.currentPos == enPassantSpace) {
         board[enPassantSpace] = 0;
         enPassantSpace = null;
       }
@@ -156,7 +154,41 @@ function King(currentPos, colour) {
         movableSpaces.push(moveSpace);
       }
     }
+
+    var leftRook = ((this.colour == "white") ? 91 : 21);
+    var rightRook = ((this.colour == "white") ? 98 : 28);
+
+    if (this.previousPos == null) {
+      if (board[leftRook].pieceVal == "Rook" && board[leftRook].previousPos == null) {
+        if (SpaceIsEmpty(board, this, this.currentPos - 1) && SpaceIsEmpty(board, this, this.currentPos - 2)) {
+          movableSpaces.push(this.currentPos - 2);
+        }
+      }
+      if (board[rightRook].pieceVal == "Rook" && board[rightRook].previousPos == null) {
+        if (SpaceIsEmpty(board, this, this.currentPos + 1) && SpaceIsEmpty(board, this, this.currentPos + 2)) {
+          movableSpaces.push(this.currentPos + 2);
+        }
+      }
+    }
     return movableSpaces;
+  };
+
+  King.prototype.Move = function(targetSpace, board) {
+    if (targetSpace - this.currentPos == 2) {
+      //Castle Kingside
+      board[this.currentPos + 1] = new Rook(this.currentPos + 1, this.colour);
+      board[this.currentPos + 3] = 0;
+    } else if (targetSpace - this.currentPos == -2) {
+      //Castle Queenside
+      board[this.currentPos - 1] = new Rook(this.currentPos - 1, this.colour);
+      board[this.currentPos - 4] = 0;
+    }
+    var tempPos = this.currentPos;
+    enPassantSpace = null;
+    this.currentPos = targetSpace;
+    this.previousPos = tempPos;
+    board[targetSpace] = this;
+    board[tempPos] = 0;
   };
 }
 
@@ -179,9 +211,9 @@ function DiagonalMovement(board, piece) {
     var tempSpace = piece.currentPos;
     while (searching) {
       tempSpace -= directions[i];
-      if (SpaceIsEmpty(board, piece,tempSpace)) {
+      if (SpaceIsEmpty(board, piece, tempSpace)) {
         movableSpaces.push(tempSpace);
-      }else if (SpaceContainsEnemy(board, piece,tempSpace)) {
+      } else if (SpaceContainsEnemy(board, piece, tempSpace)) {
         movableSpaces.push(tempSpace);
         searching = false;
       } else {
@@ -204,9 +236,9 @@ function HorizontalVerticalMovement(board, piece) {
     var tempSpace = piece.currentPos;
     while (searching) {
       tempSpace -= directions[i];
-      if (SpaceIsEmpty(board, piece,tempSpace)) {
+      if (SpaceIsEmpty(board, piece, tempSpace)) {
         movableSpaces.push(tempSpace);
-      }else if (SpaceContainsEnemy(board, piece,tempSpace)) {
+      } else if (SpaceContainsEnemy(board, piece, tempSpace)) {
         movableSpaces.push(tempSpace);
         searching = false;
       } else {
