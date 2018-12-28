@@ -6,13 +6,14 @@ $(document).ready(function () {
   DrawPieces(boardData);
 
 
+
   $(".square").click(function(event) {
     var boardId = $(this).attr('id');
     var moved = false;
 
     if (selectedPiece != null) {
       if ($(this).hasClass('movable')) {
-        selectedPiece.Move(boardId);
+        selectedPiece.Move(boardId,boardData);
         DrawPieces(boardData);
         moved = true;
         whiteTurn = !whiteTurn;
@@ -23,7 +24,7 @@ $(document).ready(function () {
     if (this.hasChildNodes() && !moved) {
       selectedPiece = boardData[boardId];
       if ((selectedPiece.colour == "white") == whiteTurn) {
-        moveableSpaces = selectedPiece.ShowMoves();
+        moveableSpaces = selectedPiece.ShowMoves(boardData);
         for (var i = 0; i < moveableSpaces.length; i++) {
           var tempSpace = $(".square#" + moveableSpaces[i] +"");
           tempSpace.addClass('movable');
