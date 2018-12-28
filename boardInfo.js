@@ -3,6 +3,8 @@ $(document).ready(function() {
   var whitePieces = [];
   var blackPieces = [];
 
+  var enPassantSpace = null;
+
   boardData = CreateNewBoardData(whitePieces, blackPieces);
 
 });
@@ -15,6 +17,7 @@ function Piece(currentPos, colour) {
   Piece.prototype.ShowMoves = function(board) {};
   Piece.prototype.Move = function(targetSpace, board) {
     var tempPos = this.currentPos;
+    enPassantSpace = null;
     this.currentPos = targetSpace;
     this.previousPos = tempPos;
     board[targetSpace] = this;
@@ -31,25 +34,56 @@ function Pawn(currentPos, colour) {
     var moveDir = ((this.colour == "white") ? -1 : 1);
 
     var searchSpace = parseInt(this.currentPos) + (moveDir * 10);
-
     if (SpaceIsEmpty(board, this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
 
     var searchSpace = parseInt(this.currentPos) + (moveDir * 20);
-
-    if (SpaceIsEmpty(board, this, searchSpace) && SpaceIsEmpty(board, this, searchSpace - (moveDir * 10)) && this.previousPos == undefined) {
+    if (SpaceIsEmpty(board, this, searchSpace)
+        && SpaceIsEmpty(board, this, searchSpace - (moveDir * 10))
+        && this.previousPos == undefined) {
       movableSpaces.push(searchSpace);
     }
     searchSpace = parseInt(this.currentPos) + (moveDir * 10) + 1;
     if (SpaceContainsEnemy(board, this, searchSpace)) {
       movableSpaces.push(searchSpace);
+    } else if (SpaceContainsEnemy(board, this, searchSpace - (moveDir * 10))) {
+      movedPiece = board[searchSpace - (moveDir * 10)];
+      if (movedPiece.currentPos == enPassantSpace) {
+        movableSpaces.push(searchSpace);
+      }
     }
     searchSpace = parseInt(this.currentPos) + (moveDir * 10) - 1;
     if (SpaceContainsEnemy(board, this, searchSpace)) {
       movableSpaces.push(searchSpace);
+    } else if (SpaceContainsEnemy(board, this, searchSpace - (moveDir * 10))) {
+      movedPiece = board[searchSpace - (moveDir * 10)];
+      if (movedPiece.currentPos == enPassantSpace) {
+        movableSpaces.push(searchSpace);
+      }
     }
     return movableSpaces;
+  };
+
+  Pawn.prototype.Move = function(targetSpace, board) {
+    var moveDir = ((this.colour == "white") ? -1 : 1);
+    var movedPiece;
+    if (SpaceContainsEnemy(board, this, targetSpace - (moveDir * 10))) {
+      movedPiece = board[targetSpace - (moveDir * 10)];
+      if(movedPiece.currentPos == enPassantSpace) {
+        board[enPassantSpace] = 0;
+        enPassantSpace = null;
+      }
+    }
+
+    var tempPos = this.currentPos;
+    this.currentPos = targetSpace;
+    if (this.previousPos == undefined) {
+      enPassantSpace = this.currentPos;
+    }
+    this.previousPos = tempPos;
+    board[targetSpace] = this;
+    board[tempPos] = 0;
   };
 }
 
