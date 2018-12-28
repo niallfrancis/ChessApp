@@ -6,6 +6,7 @@ $(document).ready(function () {
   DrawPieces(boardData);
 
 
+
   $(".square").click(function(event) {
     var boardId = $(this).attr('id');
     var moved = false;
