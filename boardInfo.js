@@ -11,12 +11,12 @@ function Piece(currentPos, colour) {
   this.currentPos = currentPos;
   this.colour = colour;
   this.pieceVal;
-  Piece.prototype.ShowMoves = function() {};
-  Piece.prototype.Move = function(targetSpace) {
+  Piece.prototype.ShowMoves = function(board) {};
+  Piece.prototype.Move = function(targetSpace, board) {
     var tempPos = this.currentPos;
     this.currentPos = targetSpace;
-    boardData[targetSpace] = this;
-    boardData[tempPos] = 0;
+    board[targetSpace] = this;
+    board[tempPos] = 0;
   };
 }
 
@@ -24,20 +24,20 @@ function Pawn(currentPos, colour) {
   Piece.call(this, currentPos, colour);
   this.pieceVal = "Pawn";
 
-  Pawn.prototype.ShowMoves = function() {
+  Pawn.prototype.ShowMoves = function(board) {
     var movableSpaces = [];
     var moveDir = ((this.colour == "white") ? -1 : 1);
     var searchSpace = parseInt(this.currentPos) + (moveDir * 10);
 
-    if (SpaceIsEmpty(this, searchSpace)) {
+    if (SpaceIsEmpty(board, this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
     searchSpace = parseInt(this.currentPos) + (moveDir * 10) + 1;
-    if (SpaceContainsEnemy(this, searchSpace)) {
+    if (SpaceContainsEnemy(board, this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
     searchSpace = parseInt(this.currentPos) + (moveDir * 10) - 1;
-    if (SpaceContainsEnemy(this, searchSpace)) {
+    if (SpaceContainsEnemy(board, this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
     return movableSpaces;
@@ -48,13 +48,13 @@ function Knight(currentPos, colour) {
   Piece.call(this, currentPos, colour);
   this.pieceVal = "Knight";
 
-  Knight.prototype.ShowMoves = function() {
+  Knight.prototype.ShowMoves = function(board) {
     var movableSpaces = [];
     var searchSpace = [-21, -19, 21, 19, 12, -8, -12, 8];
 
     for (var i = 0; i < searchSpace.length; i++) {
       moveSpace = parseInt(this.currentPos) + searchSpace[i];
-      if (SpaceIsEmpty(this, moveSpace) || SpaceContainsEnemy(this, moveSpace)) {
+      if (SpaceIsEmpty(board, this, moveSpace) || SpaceContainsEnemy(board, this, moveSpace)) {
         movableSpaces.push(moveSpace);
       }
     }
@@ -66,8 +66,8 @@ function Bishop(currentPos, colour) {
   Piece.call(this, currentPos, colour);
   this.pieceVal = "Bishop";
 
-  Bishop.prototype.ShowMoves = function() {
-    return DiagonalMovement(this);
+  Bishop.prototype.ShowMoves = function(board) {
+    return DiagonalMovement(board, this);
   };
 }
 
@@ -75,8 +75,8 @@ function Rook(currentPos, colour) {
   Piece.call(this, currentPos, colour);
   this.pieceVal = "Rook";
 
-  Rook.prototype.ShowMoves = function() {
-    return HorizontalVerticalMovement(this);
+  Rook.prototype.ShowMoves = function(board) {
+    return HorizontalVerticalMovement(board, this);
   };
 }
 
@@ -84,10 +84,10 @@ function Queen(currentPos, colour) {
   Piece.call(this, currentPos, colour);
   this.pieceVal = "Queen";
 
-  Queen.prototype.ShowMoves = function() {
+  Queen.prototype.ShowMoves = function(board) {
     var movableSpaces = [];
 
-    movableSpaces = DiagonalMovement(this).concat(HorizontalVerticalMovement(this));
+    movableSpaces = DiagonalMovement(board, this).concat(HorizontalVerticalMovement(board, this));
 
     return movableSpaces;
   };
@@ -97,14 +97,14 @@ function King(currentPos, colour) {
   Piece.call(this, currentPos, colour);
   this.pieceVal = "King";
 
-  King.prototype.ShowMoves = function() {
+  King.prototype.ShowMoves = function(board) {
     var movableSpaces = [];
 
     searchSpace = [1, -1, 10, -10, 9, -11, -9, 11];
 
     for (var i = 0; i < searchSpace.length; i++) {
       moveSpace = parseInt(this.currentPos) + searchSpace[i];
-      if (SpaceIsEmpty(this, moveSpace) || SpaceContainsEnemy(this, moveSpace)) {
+      if (SpaceIsEmpty(board, this, moveSpace) || SpaceContainsEnemy(board, this, moveSpace)) {
         movableSpaces.push(moveSpace);
       }
     }
@@ -121,7 +121,7 @@ Queen.prototype = new Piece();
 King.prototype = new Piece();
 
 //Helper class for Bishop and Queen movement
-function DiagonalMovement(piece) {
+function DiagonalMovement(board, piece) {
   var movableSpaces = [];
   var searchSpace = [];
   var directions = [11, 9, -11, -9];
@@ -131,9 +131,9 @@ function DiagonalMovement(piece) {
     var tempSpace = piece.currentPos;
     while (searching) {
       tempSpace -= directions[i];
-      if (SpaceIsEmpty(piece,tempSpace)) {
+      if (SpaceIsEmpty(board, piece,tempSpace)) {
         movableSpaces.push(tempSpace);
-      }else if (SpaceContainsEnemy(piece,tempSpace)) {
+      }else if (SpaceContainsEnemy(board, piece,tempSpace)) {
         movableSpaces.push(tempSpace);
         searching = false;
       } else {
@@ -146,7 +146,7 @@ function DiagonalMovement(piece) {
 }
 
 //Helper class for Rook and Queen movement
-function HorizontalVerticalMovement(piece) {
+function HorizontalVerticalMovement(board, piece) {
   var movableSpaces = [];
   var searchSpace = [];
   var directions = [1, 10, -1, -10];
@@ -156,9 +156,9 @@ function HorizontalVerticalMovement(piece) {
     var tempSpace = piece.currentPos;
     while (searching) {
       tempSpace -= directions[i];
-      if (SpaceIsEmpty(piece,tempSpace)) {
+      if (SpaceIsEmpty(board, piece,tempSpace)) {
         movableSpaces.push(tempSpace);
-      }else if (SpaceContainsEnemy(piece,tempSpace)) {
+      }else if (SpaceContainsEnemy(board, piece,tempSpace)) {
         movableSpaces.push(tempSpace);
         searching = false;
       } else {
@@ -166,37 +166,22 @@ function HorizontalVerticalMovement(piece) {
       }
     }
   }
-
-
-
-  // for (var i = 0; i < boardData.length; i++) {
-  //   if (((i - piece.currentPos) % 10 == 0) || (Math.floor(i / 10) == Math.floor(piece.currentPos / 10))) {
-  //     searchSpace.push(i);
-  //   }
-  // }
-  //
-  // for (var i = 0; i < searchSpace.length; i++) {
-  //   moveSpace = searchSpace[i];
-  //   if (SpaceIsEmpty(piece, moveSpace) || SpaceContainsEnemy(piece, moveSpace)) {
-  //     movableSpaces.push(moveSpace);
-  //   }
-  // }
   return movableSpaces;
 }
 
-function SpaceIsEmpty(movingPiece, targetSpace) {
-  if (boardData[targetSpace] == 0) {
+function SpaceIsEmpty(board, movingPiece, targetSpace) {
+  if (board[targetSpace] == 0) {
     return true;
   } else {
     return false;
   }
 }
 
-function SpaceContainsEnemy(movingPiece, targetSpace) {
+function SpaceContainsEnemy(board, movingPiece, targetSpace) {
   enemySpace = false;
   //Needs to check if space is not empty
-  if (boardData[targetSpace] instanceof Piece) {
-    if (boardData[targetSpace].colour != movingPiece.colour) {
+  if (board[targetSpace] instanceof Piece) {
+    if (board[targetSpace].colour != movingPiece.colour) {
       enemySpace = true;
     }
   }
@@ -207,6 +192,7 @@ function SpaceContainsEnemy(movingPiece, targetSpace) {
 function CreateNewBoardData(whitePieces, blackPieces) {
 
   boardData = GenerateFenBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+  //boardData = GenerateFenBoard("rnbqkbnr/1pp1pppp/3p4/8/2PQ4/p4P2/PP1PN1PP/RNB1KB1R");
   return boardData;
 }
 
