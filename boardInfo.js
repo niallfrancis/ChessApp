@@ -9,12 +9,14 @@ $(document).ready(function() {
 
 function Piece(currentPos, colour) {
   this.currentPos = currentPos;
+  this.previousPos;
   this.colour = colour;
   this.pieceVal;
   Piece.prototype.ShowMoves = function(board) {};
   Piece.prototype.Move = function(targetSpace, board) {
     var tempPos = this.currentPos;
     this.currentPos = targetSpace;
+    this.previousPos = tempPos;
     board[targetSpace] = this;
     board[tempPos] = 0;
   };
@@ -27,9 +29,16 @@ function Pawn(currentPos, colour) {
   Pawn.prototype.ShowMoves = function(board) {
     var movableSpaces = [];
     var moveDir = ((this.colour == "white") ? -1 : 1);
+
     var searchSpace = parseInt(this.currentPos) + (moveDir * 10);
 
     if (SpaceIsEmpty(board, this, searchSpace)) {
+      movableSpaces.push(searchSpace);
+    }
+
+    var searchSpace = parseInt(this.currentPos) + (moveDir * 20);
+
+    if (SpaceIsEmpty(board, this, searchSpace) && this.previousPos == undefined) {
       movableSpaces.push(searchSpace);
     }
     searchSpace = parseInt(this.currentPos) + (moveDir * 10) + 1;
