@@ -101,16 +101,26 @@ QUnit.test("Test Check", function(assert) {
 
   assert.notOk(testBoard[24].isChecked,"King does not start in check");
   testBoard[98].Move(94,testBoard);
-  assert.ok(testBoard[24].isChecked,"King is in check after white moves");
-  assert.notOk(testBoard[24].isCheckmated,"King is not in checkmate");
+  assert.ok(SpaceIsAttacked(testBoard, "black", testBoard[24].currentPos), "King is in check after black moves")
+  assert.notOk(CheckForCheckmate(testBoard, "black", testBoard[24]), "King is not in checkmate");
+
+});
+
+QUnit.test("Test cannot create Check by discovery", function(assert) {
+  var testFen = "3k4/8/8/3r4/8/8/8/3R4";
+  var testBoard = GenerateFenBoard(testFen);
+
+  assert.notOk(testBoard[24].isChecked,"King does not start in check");
+  var moves = testBoard[54].ShowMoves(testBoard);
+  assert.notOk(moves.includes(55),"Rook can not move to create check");
 
 });
 
 QUnit.test("Test Checkmate", function(assert) {
-  var testFen = "2q1q3/8/q7/3K4/q7/8/8/7q";
+  var testFen = "2q1q3/8/q7/3K4/q7/8/8/6q1";
   var testBoard = GenerateFenBoard(testFen);
 
-  assert.notOk(testBoard[54].isChecked,"King does not start in check");
+  assert.notOk(SpaceIsAttacked(testBoard, "black", testBoard[54].currentPos), "King does not start in check")
   testBoard[98].Move(94,testBoard);
-  assert.ok(testBoard[54].isCheckmated,"King is in checkmate");
+  assert.ok(CheckForCheckmate(testBoard, "black", testBoard[54]), "King is in checkmate");
 });
