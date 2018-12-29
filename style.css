@@ -31,6 +31,10 @@
   content:url(images/whiteKing.png);
 }
 
+.check {
+  background-color: red;
+}
+
 
 .black.Pawn {
   content:url(images/blackPawn.png);

@@ -18,16 +18,21 @@ $(document).ready(function () {
         moved = true;
         if (whiteTurn) {
           if (SpaceIsAttacked(boardData, "white", blackKing.currentPos)) {
-            console.log("check");
+            $(".square#" + blackKing.currentPos + " img").addClass('check');
             if (CheckForCheckmate(boardData, "white", blackKing)) {
 
             }
+          } else {
+            $(".square#" + blackKing.currentPos + " img").removeClass('check');
           }
         } else {
           if (SpaceIsAttacked(boardData, "black", whiteKing.currentPos)) {
-            console.log("check");
+            $(".square#" + whiteKing.currentPos + " img").addClass('check');
             if (CheckForCheckmate(boardData,"black", whiteKing)) {
+
             }
+          } else {
+            $(".square#" + whiteKing.currentPos + " img").removeClass('check');
           }
         }
         whiteTurn = !whiteTurn;

@@ -62,7 +62,7 @@ function Pawn(currentPos, colour) {
         movableSpaces.push(searchSpace);
       }
     }
-    return movableSpaces;
+    return CheckByDiscovery(board, movableSpaces, this);
   };
 
   Pawn.prototype.ShowAttacks = function(board) {
@@ -106,7 +106,6 @@ function Pawn(currentPos, colour) {
       enPassantSpace = this.currentPos;
     }
     if (targetSpace <= 29 || targetSpace >= 91) {
-      console.log("test");
       board[targetSpace] = new Queen(targetSpace, this.colour);
     } else {
       board[targetSpace] = this;
@@ -130,7 +129,7 @@ function Knight(currentPos, colour) {
         movableSpaces.push(moveSpace);
       }
     }
-    return movableSpaces;
+    return CheckByDiscovery(board, movableSpaces, this);
   };
   Knight.prototype.ShowAttacks = Knight.prototype.ShowMoves;
 }
@@ -266,7 +265,7 @@ function DiagonalMovement(board, piece) {
     }
   }
 
-  return movableSpaces;
+  return CheckByDiscovery(board, movableSpaces, piece);
 }
 
 //Helper class for Rook and Queen movement
@@ -290,7 +289,8 @@ function HorizontalVerticalMovement(board, piece) {
       }
     }
   }
-  return movableSpaces;
+
+  return CheckByDiscovery(board, movableSpaces, piece);
 }
 
 function SpaceIsEmpty(board, movingPiece, targetSpace) {
@@ -322,7 +322,6 @@ function SpaceIsAttacked(board, colour, space) {
     var targetPiece = board[space + (moveDir * 10) + pawnSpaces[i]];
     if (targetPiece instanceof Piece) {
       if (targetPiece.pieceVal == "Pawn" && targetPiece.colour == colour) {
-        console.log("pawn check");
         return true;
       }
     }
@@ -333,7 +332,6 @@ function SpaceIsAttacked(board, colour, space) {
     targetPiece = board[space + (knightSpaces[i])];
     if (targetPiece instanceof Piece) {
       if (targetPiece.pieceVal == "Knight" && targetPiece.colour == colour) {
-        console.log("knight check");
         return true;
       }
     }
@@ -349,7 +347,6 @@ function SpaceIsAttacked(board, colour, space) {
       targetPiece = board[tempSpace];
       if (targetPiece instanceof Piece) {
         if (targetPiece.colour == colour && (targetPiece.pieceVal == "Queen" || targetPiece.pieceVal == "Bishop")) {
-          console.log("diag check");
           return true;
         } else {
           searching = false;
@@ -371,7 +368,6 @@ function SpaceIsAttacked(board, colour, space) {
       targetPiece = board[tempSpace];
       if (targetPiece instanceof Piece) {
         if (targetPiece.colour == colour && (targetPiece.pieceVal == "Queen" || targetPiece.pieceVal == "Rook")) {
-          console.log("vert/horiz check");
           return true;
         } else {
           searching = false;
@@ -388,7 +384,6 @@ function SpaceIsAttacked(board, colour, space) {
     targetPiece = board[space + (kingSpaces[i])];
     if (targetPiece instanceof Piece) {
       if (targetPiece.pieceVal == "King" && targetPiece.colour == colour) {
-        console.log("king check");
         return true;
       }
     }
@@ -411,6 +406,30 @@ function CheckForCheckmate(board, colour, king) {
   return true;
 }
 
+function CheckByDiscovery(board, moves, piece) {
+
+  var validMoves = [];
+  var kingPos;
+  var enemyColour;
+
+  if (piece.colour == "white") {
+    kingPos = whiteKing.currentPos;
+    enemyColour = "black";
+  } else {
+    kingPos = blackKing.currentPos;
+    enemyColour = "white";
+  }
+  for (var i = 0; i < moves.length; i++) {
+    var tempBoard = board.slice();
+    tempBoard[moves[i]] = piece;
+    tempBoard[piece.currentPos] = 0;
+
+    if (!SpaceIsAttacked(tempBoard, enemyColour, kingPos)) {
+      validMoves.push(moves[i]);
+    }
+  }
+  return validMoves;
+}
 
 function CreateNewBoardData(whitePieces, blackPieces) {
 
