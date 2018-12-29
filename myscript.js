@@ -17,19 +17,19 @@ $(document).ready(function () {
         DrawPieces(boardData);
         moved = true;
         if (whiteTurn) {
-          if (SpaceIsAttacked(boardData, "white", blackKing.currentPos)) {
+          if (SpaceIsAttacked(boardData, "white", blackKing.currentPos).length > 0) {
             $(".square#" + blackKing.currentPos + " img").addClass('check');
             if (CheckForCheckmate(boardData, "white", blackKing)) {
-
+              $(".square#" + blackKing.currentPos + " img").addClass('mate');
             }
           } else {
             $(".square#" + blackKing.currentPos + " img").removeClass('check');
           }
         } else {
-          if (SpaceIsAttacked(boardData, "black", whiteKing.currentPos)) {
+          if (SpaceIsAttacked(boardData, "black", whiteKing.currentPos).length > 0) {
             $(".square#" + whiteKing.currentPos + " img").addClass('check');
             if (CheckForCheckmate(boardData,"black", whiteKing)) {
-
+              $(".square#" + blackKing.currentPos + " img").addClass('mate');
             }
           } else {
             $(".square#" + whiteKing.currentPos + " img").removeClass('check');

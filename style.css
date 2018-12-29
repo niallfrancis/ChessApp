@@ -35,6 +35,10 @@
   background-color: red;
 }
 
+.mate {
+  background-color: gold;
+}
+
 
 .black.Pawn {
   content:url(images/blackPawn.png);

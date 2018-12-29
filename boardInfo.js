@@ -208,7 +208,7 @@ function King(currentPos, colour) {
     var tempBoard = board.slice();
     tempBoard[this.currentPos] = 0;
     for (var i = 0; i < movableSpaces.length; i++) {
-      if (!SpaceIsAttacked(tempBoard, enemyColour, movableSpaces[i])) {
+      if (SpaceIsAttacked(tempBoard, enemyColour, movableSpaces[i]).length == 0) {
         nonCheckSpaces.push(movableSpaces[i]);
       }
     }
@@ -315,6 +315,7 @@ function SpaceContainsEnemy(board, movingPiece, targetSpace) {
 
 function SpaceIsAttacked(board, colour, space) {
 
+  var attackingPieces = [];
   var moveDir = ((this.colour == "white") ? -1 : 1);
   //Check Pawn
   var pawnSpaces = [1, -1];
@@ -322,7 +323,7 @@ function SpaceIsAttacked(board, colour, space) {
     var targetPiece = board[space + (moveDir * 10) + pawnSpaces[i]];
     if (targetPiece instanceof Piece) {
       if (targetPiece.pieceVal == "Pawn" && targetPiece.colour == colour) {
-        return true;
+        attackingPieces.push(targetPiece.currentPos);
       }
     }
   }
@@ -332,7 +333,7 @@ function SpaceIsAttacked(board, colour, space) {
     targetPiece = board[space + (knightSpaces[i])];
     if (targetPiece instanceof Piece) {
       if (targetPiece.pieceVal == "Knight" && targetPiece.colour == colour) {
-        return true;
+        attackingPieces.push(targetPiece.currentPos);
       }
     }
   }
@@ -347,7 +348,7 @@ function SpaceIsAttacked(board, colour, space) {
       targetPiece = board[tempSpace];
       if (targetPiece instanceof Piece) {
         if (targetPiece.colour == colour && (targetPiece.pieceVal == "Queen" || targetPiece.pieceVal == "Bishop")) {
-          return true;
+          attackingPieces.push(targetPiece.currentPos);
         } else {
           searching = false;
         }
@@ -368,7 +369,7 @@ function SpaceIsAttacked(board, colour, space) {
       targetPiece = board[tempSpace];
       if (targetPiece instanceof Piece) {
         if (targetPiece.colour == colour && (targetPiece.pieceVal == "Queen" || targetPiece.pieceVal == "Rook")) {
-          return true;
+          attackingPieces.push(targetPiece.currentPos);
         } else {
           searching = false;
         }
@@ -384,12 +385,12 @@ function SpaceIsAttacked(board, colour, space) {
     targetPiece = board[space + (kingSpaces[i])];
     if (targetPiece instanceof Piece) {
       if (targetPiece.pieceVal == "King" && targetPiece.colour == colour) {
-        return true;
+        attackingPieces.push(targetPiece.currentPos);
       }
     }
   }
 
-  return false;
+  return attackingPieces;
 }
 
 function CheckForCheckmate(board, colour, king) {
@@ -398,10 +399,25 @@ function CheckForCheckmate(board, colour, king) {
   var tempBoard = board.slice();
   tempBoard[king.currentPos] = 0;
   for (var i = 0; i < kingMoves.length; i++) {
-    if (!SpaceIsAttacked(tempBoard, colour, kingMoves[i])) {
+    if (SpaceIsAttacked(tempBoard, colour, kingMoves[i]).length == 0) {
       return false;
     }
   }
+
+  var pieces = [];
+  for (var i = 0; i < board.length; i++) {
+    if (board[i] instanceof Piece && board[i].colour != colour) {
+      pieces.push(board[i]);
+    }
+  }
+  for (var i = 0; i < pieces.length; i++) {
+    if (CheckByDiscovery(board, pieces[i].ShowMoves(board), pieces[i]).length != 0) {
+      return false;
+    }
+  }
+
+
+
   console.log("checkmate");
   return true;
 }
@@ -409,27 +425,33 @@ function CheckForCheckmate(board, colour, king) {
 function CheckByDiscovery(board, moves, piece) {
 
   var validMoves = [];
-  var kingPos;
+  var king;
+  var inCheck;
   var enemyColour;
 
   if (piece.colour == "white") {
-    kingPos = whiteKing.currentPos;
+    king = whiteKing;
     enemyColour = "black";
+    //inCheck = whiteInCheck;
   } else {
-    kingPos = blackKing.currentPos;
+    king = blackKing;
+  //  inCheck = blackInCheck;
     enemyColour = "white";
   }
+
   for (var i = 0; i < moves.length; i++) {
     var tempBoard = board.slice();
     tempBoard[moves[i]] = piece;
     tempBoard[piece.currentPos] = 0;
 
-    if (!SpaceIsAttacked(tempBoard, enemyColour, kingPos)) {
+    if (SpaceIsAttacked(tempBoard, enemyColour, king.currentPos) == 0) {
       validMoves.push(moves[i]);
     }
   }
   return validMoves;
 }
+
+
 
 function CreateNewBoardData(whitePieces, blackPieces) {
 

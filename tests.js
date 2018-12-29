@@ -101,7 +101,7 @@ QUnit.test("Test Check", function(assert) {
 
   assert.notOk(testBoard[24].isChecked,"King does not start in check");
   testBoard[98].Move(94,testBoard);
-  assert.ok(SpaceIsAttacked(testBoard, "black", testBoard[24].currentPos), "King is in check after black moves")
+  assert.ok(SpaceIsAttacked(testBoard, "black", testBoard[24].currentPos) > 0, "King is in check after black moves")
   assert.notOk(CheckForCheckmate(testBoard, "black", testBoard[24]), "King is not in checkmate");
 
 });
@@ -120,7 +120,7 @@ QUnit.test("Test Checkmate", function(assert) {
   var testFen = "2q1q3/8/q7/3K4/q7/8/8/6q1";
   var testBoard = GenerateFenBoard(testFen);
 
-  assert.notOk(SpaceIsAttacked(testBoard, "black", testBoard[54].currentPos), "King does not start in check");
+  assert.notOk(SpaceIsAttacked(testBoard, "black", testBoard[54].currentPos) > 0, "King does not start in check");
   testBoard[97].Move(94,testBoard);
   assert.ok(CheckForCheckmate(testBoard, "black", testBoard[54]), "King is in checkmate");
 });
