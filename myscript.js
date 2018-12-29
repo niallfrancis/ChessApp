@@ -16,15 +16,34 @@ $(document).ready(function () {
         selectedPiece.Move(boardId,boardData);
         DrawPieces(boardData);
         moved = true;
+        if (whiteTurn) {
+          if (SpaceIsAttacked(boardData, "white", blackKing.currentPos).length > 0) {
+            $(".square#" + blackKing.currentPos + " img").addClass('check');
+            if (CheckForCheckmate(boardData, "white", blackKing)) {
+              $(".square#" + blackKing.currentPos + " img").addClass('mate');
+            }
+          } else {
+            $(".square#" + blackKing.currentPos + " img").removeClass('check');
+          }
+        } else {
+          if (SpaceIsAttacked(boardData, "black", whiteKing.currentPos).length > 0) {
+            $(".square#" + whiteKing.currentPos + " img").addClass('check');
+            if (CheckForCheckmate(boardData,"black", whiteKing)) {
+              $(".square#" + blackKing.currentPos + " img").addClass('mate');
+            }
+          } else {
+            $(".square#" + whiteKing.currentPos + " img").removeClass('check');
+          }
+        }
         whiteTurn = !whiteTurn;
       }
       selectedPiece = null;
       ResetBoard();
     }
     if (this.hasChildNodes() && !moved) {
-      selectedPiece = boardData[boardId];
+      selectedPiece = boardData[parseInt(boardId)];
       if ((selectedPiece.colour == "white") == whiteTurn) {
-        moveableSpaces = selectedPiece.ShowMoves(boardData);
+        var moveableSpaces = selectedPiece.ShowMoves(boardData);
         for (var i = 0; i < moveableSpaces.length; i++) {
           var tempSpace = $(".square#" + moveableSpaces[i] +"");
           tempSpace.addClass('movable');
