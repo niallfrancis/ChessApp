@@ -1,8 +1,9 @@
 $(document).ready(function() {
 
-  var whitePieces = [];
-  var blackPieces = [];
-
+  whitePieces = [];
+  blackPieces = [];
+  var whiteKing = null;
+  var blackKing = null;
   var enPassantSpace = null;
 
   boardData = CreateNewBoardData(whitePieces, blackPieces);
@@ -15,6 +16,7 @@ function Piece(currentPos, colour) {
   this.colour = colour;
   this.pieceVal;
   Piece.prototype.ShowMoves = function(board) {};
+  Piece.prototype.ShowAttacks = function(board){};
   Piece.prototype.Move = function(targetSpace, board) {
     var tempPos = this.currentPos;
     enPassantSpace = null;
@@ -63,6 +65,30 @@ function Pawn(currentPos, colour) {
     return movableSpaces;
   };
 
+  Pawn.prototype.ShowAttacks = function(board) {
+    var movableSpaces = [];
+    var moveDir = ((this.colour == "white") ? -1 : 1);
+
+    searchSpace = parseInt(this.currentPos) + (moveDir * 10) + 1;
+    if (SpaceContainsEnemy(board, this, searchSpace)) {
+      movableSpaces.push(searchSpace);
+    } else if (SpaceContainsEnemy(board, this, searchSpace - (moveDir * 10))) {
+      movedPiece = board[searchSpace - (moveDir * 10)];
+      if (movedPiece.currentPos == enPassantSpace) {
+        movableSpaces.push(searchSpace);
+      }
+    }
+    searchSpace = parseInt(this.currentPos) + (moveDir * 10) - 1;
+    if (SpaceContainsEnemy(board, this, searchSpace)) {
+      movableSpaces.push(searchSpace);
+    } else if (SpaceContainsEnemy(board, this, searchSpace - (moveDir * 10))) {
+      movedPiece = board[searchSpace - (moveDir * 10)];
+      if (movedPiece.currentPos == enPassantSpace) {
+        movableSpaces.push(searchSpace);
+      }
+    }
+    return movableSpaces;
+  };
   Pawn.prototype.Move = function(targetSpace, board) {
     var moveDir = ((this.colour == "white") ? -1 : 1);
     var movedPiece;
@@ -106,6 +132,7 @@ function Knight(currentPos, colour) {
     }
     return movableSpaces;
   };
+  Knight.prototype.ShowAttacks = Knight.prototype.ShowMoves;
 }
 
 function Bishop(currentPos, colour) {
@@ -115,6 +142,7 @@ function Bishop(currentPos, colour) {
   Bishop.prototype.ShowMoves = function(board) {
     return DiagonalMovement(board, this);
   };
+  Bishop.prototype.ShowAttacks = Bishop.prototype.ShowMoves;
 }
 
 function Rook(currentPos, colour) {
@@ -124,6 +152,7 @@ function Rook(currentPos, colour) {
   Rook.prototype.ShowMoves = function(board) {
     return HorizontalVerticalMovement(board, this);
   };
+  Rook.prototype.ShowAttacks = Rook.prototype.ShowMoves;
 }
 
 function Queen(currentPos, colour) {
@@ -137,11 +166,14 @@ function Queen(currentPos, colour) {
 
     return movableSpaces;
   };
+  Queen.prototype.ShowAttacks = Queen.prototype.ShowMoves;
 }
 
 function King(currentPos, colour) {
   Piece.call(this, currentPos, colour);
   this.pieceVal = "King";
+  this.check = false;
+  this.checkmate = false;
 
   King.prototype.ShowMoves = function(board) {
     var movableSpaces = [];
@@ -170,8 +202,20 @@ function King(currentPos, colour) {
         }
       }
     }
-    return movableSpaces;
+
+    var nonCheckSpaces = [];
+
+    var enemyColour = ((this.colour == "white") ? "black" : "white");
+    var tempBoard = board.slice();
+    tempBoard[this.currentPos] = 0;
+    for (var i = 0; i < movableSpaces.length; i++) {
+      if (!SpaceIsAttacked(tempBoard, enemyColour, movableSpaces[i])) {
+        nonCheckSpaces.push(movableSpaces[i]);
+      }
+    }
+    return nonCheckSpaces;
   };
+  King.prototype.ShowAttacks = King.prototype.ShowMoves;
 
   King.prototype.Move = function(targetSpace, board) {
     if (targetSpace - this.currentPos == 2) {
@@ -269,6 +313,105 @@ function SpaceContainsEnemy(board, movingPiece, targetSpace) {
   return enemySpace;
 }
 
+function SpaceIsAttacked(board, colour, space) {
+
+  var moveDir = ((this.colour == "white") ? -1 : 1);
+  //Check Pawn
+  var pawnSpaces = [1 -1];
+  for (var i = 0; i < pawnSpaces.length; i++) {
+    var targetPiece = board[space - (moveDir * 10) + pawnSpaces[i]];
+    if (targetPiece instanceof Piece) {
+      if (targetPiece.pieceVal == "Pawn" && targetPiece.colour == colour) {
+        console.log("pawn check");
+        return true;
+      }
+    }
+  }
+  //Check Knights
+  var knightSpaces = [-21, -19, 21, 19, 12, -8, -12, 8];
+  for (var i = 0; i < knightSpaces.length; i++) {
+    targetPiece = board[space + (knightSpaces[i])];
+    if (targetPiece instanceof Piece) {
+      if (targetPiece.pieceVal == "Knight" && targetPiece.colour == colour) {
+        console.log("knight check");
+        return true;
+      }
+    }
+  }
+
+  //Check diagonal
+  var diagSpaces = [11, 9, -11, -9];
+  for (var i = 0; i < diagSpaces.length; i++) {
+    searching = true;
+    var tempSpace = space;
+    while (searching) {
+      tempSpace -= diagSpaces[i];
+      targetPiece = board[tempSpace];
+      if (targetPiece instanceof Piece) {
+        if (targetPiece.colour == colour && (targetPiece.pieceVal == "Queen" || targetPiece.pieceVal == "Bishop")) {
+          console.log("diag check");
+          return true;
+        } else {
+          searching = false;
+        }
+      } else if (targetPiece == 99) {
+        searching = false;
+      }
+    }
+  }
+
+  //Check Horizontal and vertical
+  var horizontalSpaces = [1, 10, -1, -10];
+
+  for (var i = 0; i < horizontalSpaces.length; i++) {
+    searching = true;
+    var tempSpace = space;
+    while (searching) {
+      tempSpace -= horizontalSpaces[i];
+      targetPiece = board[tempSpace];
+      if (targetPiece instanceof Piece) {
+        if (targetPiece.colour == colour && (targetPiece.pieceVal == "Queen" || targetPiece.pieceVal == "Rook")) {
+          console.log("vert/horiz check");
+          return true;
+        } else {
+          searching = false;
+        }
+      } else if (targetPiece == 99) {
+        searching = false;
+      }
+    }
+  }
+
+  //Check King
+  var kingSpaces = [1, -1, 10, -10, 11, -11, 9, -9];
+  for (var i = 0; i < kingSpaces.length; i++) {
+    targetPiece = board[space + (kingSpaces[i])];
+    if (targetPiece instanceof Piece) {
+      if (targetPiece.pieceVal == "King" && targetPiece.colour == colour) {
+        console.log("king check");
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+function CheckForCheckmate(board, colour, king) {
+
+  var kingMoves = king.ShowMoves(board);
+  var tempBoard = board.slice();
+  tempBoard[king.currentPos] = 0;
+  for (var i = 0; i < kingMoves.length; i++) {
+    if (!SpaceIsAttacked(tempBoard, colour, kingMoves[i])) {
+      return false;
+    }
+  }
+  console.log("checkmate");
+  return true;
+}
+
+
 function CreateNewBoardData(whitePieces, blackPieces) {
 
   boardData = GenerateFenBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
@@ -298,40 +441,66 @@ function GenerateFenBoard(fen) {
       } else {
         switch (currentChar) {
           case "p":
-            boardSpace[currentSquare] = new Pawn(currentSquare, "black");
+            var temp = new Pawn(currentSquare, "black");
+            boardSpace[currentSquare] = temp;
+            blackPieces.push(temp);
             break;
           case "P":
-            boardSpace[currentSquare] = new Pawn(currentSquare, "white");
+            var temp = new Pawn(currentSquare, "white");
+            boardSpace[currentSquare] = temp;
+            whitePieces.push(temp);
             break;
           case "n":
-            boardSpace[currentSquare] = new Knight(currentSquare, "black");
+            var temp = new Knight(currentSquare, "black");
+            boardSpace[currentSquare] = temp;
+            blackPieces.push(temp);
             break;
           case "N":
-            boardSpace[currentSquare] = new Knight(currentSquare, "white");
+            var temp = new Knight(currentSquare, "white");
+            boardSpace[currentSquare] = temp;
+            whitePieces.push(temp);
             break;
           case "b":
-            boardSpace[currentSquare] = new Bishop(currentSquare, "black");
+            var temp = new Bishop(currentSquare, "black");
+            boardSpace[currentSquare] = temp;
+            blackPieces.push(temp);
             break;
           case "B":
-            boardSpace[currentSquare] = new Bishop(currentSquare, "white");
+            var temp = new Bishop(currentSquare, "white");
+            boardSpace[currentSquare] = temp;
+            whitePieces.push(temp);
             break;
           case "r":
-            boardSpace[currentSquare] = new Rook(currentSquare, "black");
+            var temp = new Rook(currentSquare, "black");
+            boardSpace[currentSquare] = temp;
+            blackPieces.push(temp);
             break;
           case "R":
-            boardSpace[currentSquare] = new Rook(currentSquare, "white");
+            var temp = new Rook(currentSquare, "white");
+            boardSpace[currentSquare] = temp;
+            whitePieces.push(temp);
             break;
           case "q":
-            boardSpace[currentSquare] = new Queen(currentSquare, "black");
+            var temp = new Queen(currentSquare, "black");
+            boardSpace[currentSquare] = temp;
+            blackPieces.push(temp);
             break;
           case "Q":
-            boardSpace[currentSquare] = new Queen(currentSquare, "white");
+            var temp = new Queen(currentSquare, "white");
+            boardSpace[currentSquare] = temp;
+            whitePieces.push(temp);
             break;
           case "k":
-            boardSpace[currentSquare] = new King(currentSquare, "black");
+            var tempKing = new King(currentSquare, "black");
+            boardSpace[currentSquare] = tempKing;
+            blackKing = tempKing;
+            blackPieces.push(tempKing);
             break;
           case "K":
-            boardSpace[currentSquare] = new King(currentSquare, "white");
+            var tempKing = new King(currentSquare, "white");
+            boardSpace[currentSquare] = tempKing;
+            whiteKing = tempKing;
+            whitePieces.push(tempKing);
             break;
           default:
 

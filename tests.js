@@ -3,8 +3,8 @@ QUnit.test( "Test Board Generation", function( assert ) {
   blackPieces = [];
 
   var testBoard = CreateNewBoardData(whitePieces, blackPieces);;
-  assert.equal(whitePieces.length = 16, 16, "16 starting white pieces" );
-  assert.equal(blackPieces.length = 16, 16, "16 starting black pieces" );
+  assert.equal(whitePieces.length, 16, "16 starting white pieces" );
+  assert.equal(blackPieces.length, 16, "16 starting black pieces" );
 
   assert.equal(testBoard[21].pieceVal, "Rook", "Upper left square is Rook" );
   assert.equal(testBoard[94].pieceVal, "Queen", "White side queen is in correct position" );

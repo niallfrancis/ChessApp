@@ -16,15 +16,29 @@ $(document).ready(function () {
         selectedPiece.Move(boardId,boardData);
         DrawPieces(boardData);
         moved = true;
+        if (whiteTurn) {
+          if (SpaceIsAttacked(boardData, "white", blackKing.currentPos)) {
+            console.log("check");
+            if (CheckForCheckmate(boardData, "white", blackKing)) {
+
+            }
+          }
+        } else {
+          if (SpaceIsAttacked(boardData, "black", whiteKing.currentPos)) {
+            console.log("check");
+            if (CheckForCheckmate(boardData,"black", whiteKing)) {
+            }
+          }
+        }
         whiteTurn = !whiteTurn;
       }
       selectedPiece = null;
       ResetBoard();
     }
     if (this.hasChildNodes() && !moved) {
-      selectedPiece = boardData[boardId];
+      selectedPiece = boardData[parseInt(boardId)];
       if ((selectedPiece.colour == "white") == whiteTurn) {
-        moveableSpaces = selectedPiece.ShowMoves(boardData);
+        var moveableSpaces = selectedPiece.ShowMoves(boardData);
         for (var i = 0; i < moveableSpaces.length; i++) {
           var tempSpace = $(".square#" + moveableSpaces[i] +"");
           tempSpace.addClass('movable');
