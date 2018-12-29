@@ -317,9 +317,9 @@ function SpaceIsAttacked(board, colour, space) {
 
   var moveDir = ((this.colour == "white") ? -1 : 1);
   //Check Pawn
-  var pawnSpaces = [1 -1];
+  var pawnSpaces = [1, -1];
   for (var i = 0; i < pawnSpaces.length; i++) {
-    var targetPiece = board[space - (moveDir * 10) + pawnSpaces[i]];
+    var targetPiece = board[space + (moveDir * 10) + pawnSpaces[i]];
     if (targetPiece instanceof Piece) {
       if (targetPiece.pieceVal == "Pawn" && targetPiece.colour == colour) {
         console.log("pawn check");
