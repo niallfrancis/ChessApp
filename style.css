@@ -1,145 +1,172 @@
 
+#lobby {
+    margin: auto;
+    width:10%;
+}
 #players {
   font-size: 20px;
   width: 10%;
   cursor: pointer;
 }
-
+#users {
+  list-style-type: none;
+  padding-inline-start: 0px;
+}
 #board {
-    width: 480px;
-    height: 480px;
-    position:relative;
-    border-style: solid;
-    border-width: 5px;
+  margin: auto;
+  width: 480px;
+  height: 480px;
+  position: relative;
+  border-style: solid;
+  border-width: 5px;
 }
-
 #infoPanel {
-    width: 30%;
-    background-color: lightblue;
-    font-size: 20px;
+  margin: auto;
+  width: 30%;
+  background-color: lightblue;
+  font-size: 20px;
 }
 
+#infoText{
+  position: relative;
+  text-align: center;
+  margin: auto;
+  margin-bottom: 3px;
+  width: 70%;
+}
+
+#infoPanel > div {
+  margin: auto;
+  width: 10%;
+  margin-bottom: 3px;
+}
+
+a {
+  margin: auto;
+  background-color: #90ce9a;
+  color: white;
+  padding: 14px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+
+  margin: 2px;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: #c6d6ef;
+}
+
+h1 {
+  font-size: 100px;
+  text-align: center;
+}
+img {
+  cursor: pointer;
+}
 .white.Pawn {
-  content:url(images/whitePawn.png);
+  content: url(images/whitePawn.png);
 }
-
 .white.Knight {
-  content:url(images/whiteKnight.png);
+  content: url(images/whiteKnight.png);
 }
-
 .white.Bishop {
-  content:url(images/whiteBishop.png);
+  content: url(images/whiteBishop.png);
 }
-
 .white.Rook {
-  content:url(images/whiteRook.png);
+  content: url(images/whiteRook.png);
 }
-
 .white.Queen {
-  content:url(images/whiteQueen.png);
+  content: url(images/whiteQueen.png);
 }
-
 .white.King {
-  content:url(images/whiteKing.png);
+  content: url(images/whiteKing.png);
 }
-
 .check {
   background-color: red;
 }
-
 .mate {
   background-color: gold;
 }
-
-
 .black.Pawn {
-  content:url(images/blackPawn.png);
+  content: url(images/blackPawn.png);
 }
-
 .black.Knight {
-  content:url(images/blackKnight.png);
+  content: url(images/blackKnight.png);
 }
-
 .black.Bishop {
-  content:url(images/blackBishop.png);
+  content: url(images/blackBishop.png);
 }
-
 .black.Rook {
-  content:url(images/blackRook.png);
+  content: url(images/blackRook.png);
 }
-
 .black.Queen {
-  content:url(images/blackQueen.png);
+  content: url(images/blackQueen.png);
 }
-
 .black.King {
-  content:url(images/blackKing.png);
+  content: url(images/blackKing.png);
 }
-
 .square {
-    position: absolute;
-    width: 60px;
-    height: 60px;
+  position: absolute;
+  width: 60px;
+  height: 60px;
 }
-
 .light {
-    background-color:#f7f7f7;
+  background-color: #f7f7f7;
 }
-
 .dark {
-    background-color:#3a3e59;
+  background-color: #3a3e59;
 }
-
 .movable {
   background-color: #706d6d;
-
+  cursor: pointer;
 }
 .rank1 {
-    top: 0px;
+  top: 0px;
 }
 .rank2 {
-    top: 60px;
+  top: 60px;
 }
 .rank3 {
-    top: 120px;
+  top: 120px;
 }
 .rank4 {
-    top: 180px;
+  top: 180px;
 }
 .rank5 {
-    top: 240px;
+  top: 240px;
 }
 .rank6 {
-    top: 300px;
+  top: 300px;
 }
 .rank7 {
-    top: 360px;
+  top: 360px;
 }
 .rank8 {
-    top: 420px;
+  top: 420px;
 }
-
 .file1 {
-    left: 0px;
+  left: 0px;
 }
 .file2 {
-    left: 60px;
+  left: 60px;
 }
 .file3 {
-    left: 120px;
+  left: 120px;
 }
 .file4 {
-    left: 180px;
+  left: 180px;
 }
 .file5 {
-    left: 240px;
+  left: 240px;
 }
 .file6 {
-    left: 300px;
+  left: 300px;
 }
 .file7 {
-    left: 360px;
+  left: 360px;
 }
 .file8 {
-    left: 420px;
+  left: 420px;
 }

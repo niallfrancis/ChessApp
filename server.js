@@ -2,6 +2,7 @@ var WebSocketServer = require("websocket").server;
 var http = require("http");
 const uuidv4 = require('uuid-v4');
 
+//Create server
 var server = http.createServer(function(request, response) {
   console.log(new Date() + " Received request");
 });
@@ -9,6 +10,7 @@ server.listen(1337, function() {
   console.log(new Date() + " listening on port 1337");
 });
 
+//Create WebSocketServer
 wsServer = new WebSocketServer({
   httpServer: server
 });
@@ -17,16 +19,16 @@ var users = [];
 var pairs = [];
 var connections = {};
 
-
 function htmlEntities(str) {
   return String(str)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-// Array with some colors
-var colors = [ 'red', 'green', 'blue', 'magenta', 'purple', 'plum', 'orange' ];
-// ... in random order
-colors.sort(function(a,b) { return Math.random() > 0.5; } );
+var colors = ['red', 'green', 'blue', 'magenta', 'purple', 'plum', 'orange'];
+
+colors.sort(function(a, b) {
+  return Math.random() > 0.5;
+});
 
 
 wsServer.on("request", function(request) {
@@ -37,12 +39,13 @@ wsServer.on("request", function(request) {
   var userName = false;
   var userColor = false;
 
+  //When receiving a message
   connection.on('message', function(message) {
     var messageJson = JSON.parse(message.utf8Data);
     if (message.type === 'utf8') {
-    // first message sent by user is their name
-     if (userName === false) {
-       var validName = true;
+      // first message sent by user is their name
+      if (userName === false) {
+        var validName = true;
         // remember user name
         for (var i = 0; i < users.length; i++) {
           if (users[i].username == messageJson.message) {
@@ -50,6 +53,7 @@ wsServer.on("request", function(request) {
             break;
           }
         }
+        //Check name is valid
         if (validName) {
           userName = htmlEntities(messageJson.message);
           var tempUser = {
@@ -66,27 +70,35 @@ wsServer.on("request", function(request) {
             colour: userColor,
             id: connection.id
           };
-          var updateUserJson = JSON.stringify({type:'updateUsers', data: obj});
-          var colourJson = JSON.stringify({type:'colour', data: obj});
+          var updateUserJson = JSON.stringify({
+            type: 'updateUsers',
+            data: obj
+          });
+          var colourJson = JSON.stringify({
+            type: 'colour',
+            data: obj
+          });
+          //Send back json to the connection that added it's username
           connection.sendUTF(colourJson);
+          //Tell all other connections that a new user has joined
           for (var id in connections) {
             connections[id].sendUTF(updateUserJson);
           }
-          console.log((new Date()) + ' User is known as: ' + userName
-                      + ' with ' + obj.colour + ' color.');
+          console.log((new Date()) + ' User is known as: ' + userName + ' with ' + obj.colour + ' color.');
         }
 
       } else {
         var type = messageJson.type;
 
+        //New game message
         if (type === "newGame") {
           var player1Id = messageJson.player1;
-
           var obj = {
             player1: player1Id,
             player2: connection.id
           };
 
+          //Remove user from list of users who are ready to play
           for (var i = 0; i < users.length; i++) {
             if (users[i].id === player1Id || users[i].id === connection.id) {
               users.splice(i, 1);
@@ -94,31 +106,40 @@ wsServer.on("request", function(request) {
             }
           }
 
+          //Push pair of players to pairs array
           pairs.push(obj);
-          for (var i = 0; i < pairs.length; i++) {
-            console.log(pairs[i].player1 + " " + pairs[i].player2);
-          }
-          var newGameJson = JSON.stringify({type:'newGame', data: obj});
+          var newGameJson = JSON.stringify({
+            type: 'newGame',
+            data: obj
+          });
+          //Tell player 1 new game has started
           connections[player1Id].sendUTF(newGameJson);
+          //Tell player 2 new game has started
           connections[connection.id].sendUTF(newGameJson);
         } else {
-          console.log("Move Sent");
+          //Move has been made
           var obj = {
             fen: messageJson.fen,
             pass: messageJson.passSpace
           };
-          var updateGameJson = JSON.stringify({type:'updateGame', data: obj});
+          var updateGameJson = JSON.stringify({
+            type: 'updateGame',
+            data: obj
+          });
+          //Send board to opponent
           connections[messageJson.opponent].sendUTF(updateGameJson);
         }
       }
     }
   });
 
+  //When connection is closed
   connection.on('close', function(connection) {
     if (userName !== false && userColor !== false) {
-      console.log("Closing a connection " + connections[id].id+ "");
+      console.log("Closing a connection " + connections[id].id + "");
       colors.push(userColor);
 
+      //Remove disconnecting user from user list
       for (var i = 0; i < users.length; i++) {
         if (users[i].id === id) {
           users.splice(i, 1);
@@ -129,26 +150,40 @@ wsServer.on("request", function(request) {
       var obj = {
         users: users
       };
-      var opponentLeft = JSON.stringify({type:'opponentLeft', data: obj});
+      var opponentLeft = JSON.stringify({
+        type: 'opponentLeft',
+        data: obj
+      });
 
+      //Loop through pairs to find leaving player's opponent
       for (var i = 0; i < pairs.length; i++) {
+        //If player 1 has left
         if (pairs[i].player1 === id) {
+          //Tell player 2 and remove from pairs
           connections[pairs[i].player2].sendUTF(opponentLeft);
           pairs.splice(i, 1);
           break;
         }
+        //If player 2 has left
         if (pairs[i].player2 === id) {
+          //Tell player 1 and remove from pairs
           connections[pairs[i].player1].sendUTF(opponentLeft);
           pairs.splice(i, 1);
           break;
         }
       }
 
+      //Delete connection
+      delete connections;
       delete connections[id];
       var obj = {
         users: users
       };
-      var updateUserJson = JSON.stringify({type:'updateUsers', data: obj});
+      var updateUserJson = JSON.stringify({
+        type: 'updateUsers',
+        data: obj
+      });
+      //Tell all other conenctions a user has disconnected
       for (var ids in connections) {
         connections[ids].sendUTF(updateUserJson);
       }

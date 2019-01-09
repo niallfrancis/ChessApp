@@ -1,19 +1,19 @@
 $(document).ready(function() {
 
-  whitePieces = [];
-  blackPieces = [];
   var whiteKing = null;
   var blackKing = null;
   var enPassantSpace = null;
 
-  boardData = CreateNewBoardData(whitePieces, blackPieces);
+  boardData = CreateNewBoardData();
 
 });
 
+//Factory Method to create pieces on command
 factory = {
   create: function(piece, pos, colour, hasmoved) {
     var p;
 
+    //Set p to different piece depending on given value
     switch (piece) {
       case "Pawn":
         p = new Pawn(pos, colour, hasmoved);
@@ -39,6 +39,7 @@ factory = {
   }
 }
 
+//Parent Piece class which will be inherited
 function Piece(currentPos, colour, hasMoved) {
   this.currentPos = currentPos;
   this.hasMoved = hasMoved;
@@ -59,19 +60,23 @@ function Pawn(currentPos, colour, hasMoved) {
   Piece.call(this, currentPos, colour, hasMoved);
   this.pieceVal = "Pawn";
 
+  //Override show moves for pawn
   Pawn.prototype.ShowMoves = function(board) {
     var movableSpaces = [];
     var moveDir = ((this.colour == "white") ? -1 : 1);
 
+    //Check space directly infront
     var searchSpace = parseInt(this.currentPos) + (moveDir * 10);
     if (SpaceIsEmpty(board, this, searchSpace)) {
       movableSpaces.push(searchSpace);
     }
 
-    var searchSpace = parseInt(this.currentPos) + (moveDir * 20);
+    //Check space two in front if piece has not moved yet
+    searchSpace = parseInt(this.currentPos) + (moveDir * 20);
     if (SpaceIsEmpty(board, this, searchSpace) && SpaceIsEmpty(board, this, searchSpace - (moveDir * 10)) && !this.hasMoved) {
       movableSpaces.push(searchSpace);
     }
+    //Check diagonal space 1 one to take pieces, including en passant
     searchSpace = parseInt(this.currentPos) + (moveDir * 10) + 1;
     if (SpaceContainsEnemy(board, this, searchSpace)) {
       movableSpaces.push(searchSpace);
@@ -81,24 +86,7 @@ function Pawn(currentPos, colour, hasMoved) {
         movableSpaces.push(searchSpace);
       }
     }
-    searchSpace = parseInt(this.currentPos) + (moveDir * 10) - 1;
-    if (SpaceContainsEnemy(board, this, searchSpace)) {
-      movableSpaces.push(searchSpace);
-    } else if (SpaceContainsEnemy(board, this, searchSpace - (moveDir * 10))) {
-      movedPiece = board[searchSpace - (moveDir * 10)];
-      if (movedPiece.currentPos == enPassantSpace) {
-        movableSpaces.push(searchSpace);
-      }
-    }
-    searchSpace = parseInt(this.currentPos) + (moveDir * 10) + 1;
-    if (SpaceContainsEnemy(board, this, searchSpace)) {
-      movableSpaces.push(searchSpace);
-    } else if (SpaceContainsEnemy(board, this, searchSpace - (moveDir * 10))) {
-      movedPiece = board[searchSpace - (moveDir * 10)];
-      if (movedPiece.currentPos == enPassantSpace) {
-        movableSpaces.push(searchSpace);
-      }
-    }
+    //Check diagonal space 2 one to take pieces, including en passant
     searchSpace = parseInt(this.currentPos) + (moveDir * 10) - 1;
     if (SpaceContainsEnemy(board, this, searchSpace)) {
       movableSpaces.push(searchSpace);
@@ -110,9 +98,13 @@ function Pawn(currentPos, colour, hasMoved) {
     }
     return CheckByDiscovery(board, movableSpaces, this);
   };
+
+  //Override pawn movement
   Pawn.prototype.Move = function(targetSpace, board) {
     var moveDir = ((this.colour == "white") ? -1 : 1);
     var movedPiece;
+
+    //Take piece for en passant
     if (SpaceContainsEnemy(board, this, targetSpace - (moveDir * 10))) {
       movedPiece = board[targetSpace - (moveDir * 10)];
       if (movedPiece.currentPos == enPassantSpace) {
@@ -121,11 +113,16 @@ function Pawn(currentPos, colour, hasMoved) {
       }
     }
 
+    //Move Piece
     var tempPos = this.currentPos;
     this.currentPos = targetSpace;
+
+    //Set en passant space
     if (!this.hasMoved) {
       enPassantSpace = this.currentPos;
     }
+
+    //Upgrade pawn to queen if reaching the final row
     if (targetSpace <= 29 || targetSpace >= 91) {
       board[targetSpace] = new Queen(targetSpace, this.colour);
     } else {
@@ -144,6 +141,7 @@ function Knight(currentPos, colour, hasMoved) {
     var movableSpaces = [];
     var searchSpace = [-21, -19, 21, 19, 12, -8, -12, 8];
 
+    //Check each possible knight movement space
     for (var i = 0; i < searchSpace.length; i++) {
       moveSpace = parseInt(this.currentPos) + searchSpace[i];
       if (SpaceIsEmpty(board, this, moveSpace) || SpaceContainsEnemy(board, this, moveSpace)) {
@@ -158,6 +156,7 @@ function Bishop(currentPos, colour, hasMoved) {
   Piece.call(this, currentPos, colour, hasMoved);
   this.pieceVal = "Bishop";
 
+  //Use DiagonalMovement function
   Bishop.prototype.ShowMoves = function(board) {
     return DiagonalMovement(board, this);
   };
@@ -167,6 +166,7 @@ function Rook(currentPos, colour, hasMoved) {
   Piece.call(this, currentPos, colour, hasMoved);
   this.pieceVal = "Rook";
 
+  //Use HorizontalMovement function
   Rook.prototype.ShowMoves = function(board) {
     return HorizontalVerticalMovement(board, this);
   };
@@ -178,9 +178,8 @@ function Queen(currentPos, colour, hasMoved) {
 
   Queen.prototype.ShowMoves = function(board) {
     var movableSpaces = [];
-
+    //Use horizontal & DiagonalMovement functions combined
     movableSpaces = DiagonalMovement(board, this).concat(HorizontalVerticalMovement(board, this));
-
     return movableSpaces;
   };
 }
@@ -196,6 +195,7 @@ function King(currentPos, colour, hasMoved) {
 
     searchSpace = [1, -1, 10, -10, 9, -11, -9, 11];
 
+    //Check each movement space the king can move to
     for (var i = 0; i < searchSpace.length; i++) {
       moveSpace = parseInt(this.currentPos) + searchSpace[i];
       if (SpaceIsEmpty(board, this, moveSpace) || SpaceContainsEnemy(board, this, moveSpace)) {
@@ -206,8 +206,11 @@ function King(currentPos, colour, hasMoved) {
     var leftRook = ((this.colour == "white") ? 91 : 21);
     var rightRook = ((this.colour == "white") ? 98 : 28);
 
+    //Check if king has moved for castle
     if (!this.hasMoved) {
+      //Confirm rook has not moved
       if (board[leftRook].pieceVal == "Rook" && !board[leftRook].hasMoved) {
+        //Castle pieces if possible
         if (SpaceIsEmpty(board, this, this.currentPos - 1) && SpaceIsEmpty(board, this, this.currentPos - 2)) {
           movableSpaces.push(this.currentPos - 2);
         }
@@ -224,6 +227,8 @@ function King(currentPos, colour, hasMoved) {
     var enemyColour = ((this.colour == "white") ? "black" : "white");
     var tempBoard = board.slice();
     tempBoard[this.currentPos] = 0;
+
+    //Only show spaces that don't place you in check
     for (var i = 0; i < movableSpaces.length; i++) {
       if (SpaceIsAttacked(tempBoard, enemyColour, movableSpaces[i]).length == 0) {
         nonCheckSpaces.push(movableSpaces[i]);
@@ -242,6 +247,8 @@ function King(currentPos, colour, hasMoved) {
       board[this.currentPos - 1] = new Rook(this.currentPos - 1, this.colour);
       board[this.currentPos - 4] = 0;
     }
+
+    //Handle movement
     var tempPos = this.currentPos;
     enPassantSpace = null;
     this.currentPos = targetSpace;
@@ -265,9 +272,11 @@ function DiagonalMovement(board, piece) {
   var searchSpace = [];
   var directions = [11, 9, -11, -9];
 
+  //Loop in each diagonal direction
   for (var i = 0; i < directions.length; i++) {
     searching = true;
     var tempSpace = piece.currentPos;
+    //Keep searching until a space containing a piece or end of board is found
     while (searching) {
       tempSpace -= directions[i];
       if (SpaceIsEmpty(board, piece, tempSpace)) {
@@ -290,9 +299,11 @@ function HorizontalVerticalMovement(board, piece) {
   var searchSpace = [];
   var directions = [1, 10, -1, -10];
 
+  //Loop in each vertical and horizontal direction
   for (var i = 0; i < directions.length; i++) {
     searching = true;
     var tempSpace = piece.currentPos;
+    //Keep searching until a space containing a piece or end of board is found
     while (searching) {
       tempSpace -= directions[i];
       if (SpaceIsEmpty(board, piece, tempSpace)) {
@@ -309,6 +320,7 @@ function HorizontalVerticalMovement(board, piece) {
   return CheckByDiscovery(board, movableSpaces, piece);
 }
 
+//Checks space does not contain another piece
 function SpaceIsEmpty(board, movingPiece, targetSpace) {
   if (board[targetSpace] == 0) {
     return true;
@@ -317,9 +329,9 @@ function SpaceIsEmpty(board, movingPiece, targetSpace) {
   }
 }
 
+//Checks there is a piece of the opposing colour
 function SpaceContainsEnemy(board, movingPiece, targetSpace) {
   enemySpace = false;
-  //Needs to check if space is not empty
   if (board[targetSpace] instanceof Piece) {
     if (board[targetSpace].colour != movingPiece.colour) {
       enemySpace = true;
@@ -329,6 +341,7 @@ function SpaceContainsEnemy(board, movingPiece, targetSpace) {
   return enemySpace;
 }
 
+//Performs similar actions to show moves to find if target square is attacked
 function SpaceIsAttacked(board, colour, space) {
 
   var attackingPieces = [];
@@ -409,11 +422,13 @@ function SpaceIsAttacked(board, colour, space) {
   return attackingPieces;
 }
 
+//Check if king is in checkmate
 function CheckForCheckmate(board, colour, king) {
 
   var kingMoves = king.ShowMoves(board);
   var tempBoard = board.slice();
   tempBoard[king.currentPos] = 0;
+  //Check if any of the King's moves can get out of check
   for (var i = 0; i < kingMoves.length; i++) {
     if (SpaceIsAttacked(tempBoard, colour, kingMoves[i]).length == 0) {
       return false;
@@ -421,23 +436,25 @@ function CheckForCheckmate(board, colour, king) {
   }
 
   var pieces = [];
+  //Get enemy all pieces
   for (var i = 0; i < board.length; i++) {
     if (board[i] instanceof Piece && board[i].colour != colour) {
       pieces.push(board[i]);
     }
   }
+
+  //Check if piece can be removed to solve check
   for (var i = 0; i < pieces.length; i++) {
     if (CheckByDiscovery(board, pieces[i].ShowMoves(board), pieces[i]).length != 0) {
       return false;
     }
   }
 
-
-
-  console.log("checkmate");
   return true;
 }
 
+
+//Ensure moving a piece will not create check
 function CheckByDiscovery(board, moves, piece) {
 
   var validMoves = [];
@@ -448,13 +465,12 @@ function CheckByDiscovery(board, moves, piece) {
   if (piece.colour == "white") {
     king = whiteKing;
     enemyColour = "black";
-    //inCheck = whiteInCheck;
   } else {
     king = blackKing;
-  //  inCheck = blackInCheck;
     enemyColour = "white";
   }
 
+  //Push validMoves for moves that don't cause a check
   for (var i = 0; i < moves.length; i++) {
     var tempBoard = board.slice();
     tempBoard[moves[i]] = piece;
@@ -469,38 +485,48 @@ function CheckByDiscovery(board, moves, piece) {
 
 
 
-function CreateNewBoardData(whitePieces, blackPieces) {
-
+function CreateNewBoardData() {
+  //Create a board with starting FEN configuration
   boardData = GenerateFenBoard("urunubuqukubunur./upupupupupupupup./.8./.8./.8./.8./uPuPuPuPuPuPuPuP./uRuNuBuQuKuBuNuR");
   return boardData;
 }
 
+//Get FEN from current board data
 function GetBoardFen(board) {
   var fen = "";
   var concurrentBlanks = 0;
+
+  //Loop through the whole board
   for (var i = 0; i < board.length; i++) {
 
+    //If the end of the row has been reached
     if ((i > 19 && i < 99) && (i % 10 == 9)) {
+      //Add number of previous blanks
       if (concurrentBlanks > 0) {
         fen += "." + concurrentBlanks;
         concurrentBlanks = 0;
       }
+      //Indicate new line
       fen += "./"
     }
+    //Check not null
     if (board[i] != 99) {
-
+      //Check current space contains a piece
       if (board[i] instanceof Piece) {
+        //If there have been blanks
         if (concurrentBlanks > 0) {
           fen += "." + concurrentBlanks;
           concurrentBlanks = 0;
         }
-
         var addition = "";
+        //decide if each piece has been moveDir
+        //and preceed it with a char to indicate so
         if (board[i].hasMoved) {
           addition = "m";
         } else {
           addition = "u";
         }
+        //depending on piece add corresponding char
         switch (board[i].pieceVal) {
           case "Pawn":
             addition += "p";
@@ -524,13 +550,15 @@ function GetBoardFen(board) {
 
         }
 
+        //Make addition capital if it is a white piece
         if (board[i].colour == "white") {
           addition = addition.toUpperCase();
         }
-
         fen += addition;
       } else {
+        //Increase if space is blank
         concurrentBlanks++;
+        //8 blanks is the maximum number of blanks per row
         if (concurrentBlanks == 8) {
           fen += "." + concurrentBlanks;
           concurrentBlanks = 0;
@@ -542,26 +570,31 @@ function GetBoardFen(board) {
   return fen;
 }
 
+//Generate board data from FEN
 function GenerateFenBoard(fen) {
 
   var boardSize = 120;
   var boardSpace = [];
   var currentSquare = 21;
 
+  //Set all spaces on board to start null
   for (var i = 0; i < boardSize; i++) {
     boardSpace[i] = 99;
   }
 
+  //For each char in fen, 2 at a time
   for (var i = 0; i < fen.length; i += 2) {
-    var currentChar = fen.charAt(i+1);
+    var currentChar = fen.charAt(i + 1);
     var moved = ((fen.charAt(i) == "u" || fen.charAt(i) == "U") ? false : true);
     if (currentChar != "/") {
       if (!isNaN(currentChar)) {
+        //if currentchar is a number skip that many spaces
         for (var j = 0; j < parseInt(currentChar, 10); j++) {
           boardSpace[currentSquare] = 0;
           currentSquare++;
         }
       } else {
+        //create piece using factory that corresponds to the char
         switch (currentChar) {
           case "p":
             var temp = factory.create("Pawn", currentSquare, "black", moved);
@@ -596,7 +629,7 @@ function GenerateFenBoard(fen) {
             boardSpace[currentSquare] = temp;
             break;
           case "q":
-            var temp = factory.create("Queen", "black", moved);
+            var temp = factory.create("Queen", currentSquare, "black", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "Q":
@@ -619,6 +652,7 @@ function GenerateFenBoard(fen) {
         currentSquare++;
       }
     } else {
+      //Increment currentSquare by two to skip null spaces
       currentSquare += 2;
     }
   }
