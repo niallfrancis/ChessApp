@@ -70,10 +70,7 @@ wsServer.on("request", function(request) {
             colour: userColor,
             id: connection.id
           };
-          var updateUserJson = JSON.stringify({
-            type: 'updateUsers',
-            data: obj
-          });
+
           var colourJson = JSON.stringify({
             type: 'colour',
             data: obj
@@ -81,9 +78,7 @@ wsServer.on("request", function(request) {
           //Send back json to the connection that added it's username
           connection.sendUTF(colourJson);
           //Tell all other connections that a new user has joined
-          for (var id in connections) {
-            connections[id].sendUTF(updateUserJson);
-          }
+          UpdateUsers();
           console.log((new Date()) + ' User is known as: ' + userName + ' with ' + obj.colour + ' color.');
         }
 
@@ -100,12 +95,19 @@ wsServer.on("request", function(request) {
 
           //Remove user from list of users who are ready to play
           for (var i = 0; i < users.length; i++) {
-            if (users[i].id === player1Id || users[i].id === connection.id) {
+            if (users[i].id === player1Id) {
               users.splice(i, 1);
-              break;
             }
           }
 
+          //Second loop is needed for player 2 because users has been changed during last loop
+          for (var i = 0; i < users.length; i++) {
+            if (users[i].id === connection.id) {
+              users.splice(i, 1);
+            }
+          }
+
+          UpdateUsers();
           //Push pair of players to pairs array
           pairs.push(obj);
           var newGameJson = JSON.stringify({
@@ -133,6 +135,18 @@ wsServer.on("request", function(request) {
     }
   });
 
+  function UpdateUsers() {
+    var obj = {
+      users: users
+    };
+    var updateUserJson = JSON.stringify({
+      type: 'updateUsers',
+      data: obj
+    });
+    for (var id in connections) {
+      connections[id].sendUTF(updateUserJson);
+    }
+  }
   //When connection is closed
   connection.on('close', function(connection) {
     if (userName !== false && userColor !== false) {
