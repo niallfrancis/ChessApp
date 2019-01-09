@@ -37,11 +37,12 @@ wsServer.on("request", function(request) {
   var userColor = false;
 
   connection.on('message', function(message) {
+    var messageJson = JSON.parse(message.utf8Data);
     if (message.type === 'utf8') {
     // first message sent by user is their name
      if (userName === false) {
         // remember user name
-        userName = htmlEntities(message.utf8Data);
+        userName = htmlEntities(messageJson.message);
         var tempUser = {
           username: userName,
           id: connection.id
@@ -65,10 +66,10 @@ wsServer.on("request", function(request) {
         console.log((new Date()) + ' User is known as: ' + userName
                     + ' with ' + obj.colour + ' color.');
       } else {
-        message = htmlEntities(message.utf8Data);
+        var type = messageJson.type;
 
-        if (message.substring(0,7) === "newGame") {
-          var player1Id = message.substring(7);
+        if (type === "newGame") {
+          var player1Id = messageJson.player1;
 
           var obj = {
             player1: player1Id,
@@ -79,12 +80,12 @@ wsServer.on("request", function(request) {
           connections[connection.id].sendUTF(newGameJson);
         } else {
           console.log("Move Sent");
-          var parts = message.split("|");
           var obj = {
-            fen: parts[0]
+            fen: messageJson.fen,
+            pass: messageJson.passSpace
           };
           var updateGameJson = JSON.stringify({type:'updateGame', data: obj});
-          connections[parts[1]].sendUTF(updateGameJson);
+          connections[messageJson.opponent].sendUTF(updateGameJson);
         }
       }
     }

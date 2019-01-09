@@ -51,6 +51,7 @@ $(document).ready(function () {
     } else if (json.type === 'updateGame') {
       console.log(json.data.fen);
       boardData = GenerateFenBoard(json.data.fen);
+      enPassantSpace = json.data.pass;
       DrawPieces(boardData);
       DrawCheck(boardData);
       whiteTurn = !whiteTurn;
@@ -73,7 +74,8 @@ $(document).ready(function () {
         return;
       }
       // send the message as an ordinary text
-      connection.send(msg);
+      var jsonMsg = JSON.stringify({message: msg});
+      connection.send(jsonMsg);
       $(this).val('');
       // disable the input field to make the user wait until server
       // sends back response
@@ -89,7 +91,8 @@ $(document).ready(function () {
 
   $("#users").on("click", ".player", function(event) {
     myOpp = $(this).attr('id');
-    connection.send("newGame" + myOpp);
+    var newgameJson = JSON.stringify({type: "newGame", player1: myOpp});
+    connection.send(newgameJson);
   });
 
   $("#board").on("click", ".square", function(event) {
@@ -125,7 +128,8 @@ $(document).ready(function () {
   function SendBoardData(boardData) {
     //Turn board data to fen
     var fen = GetBoardFen(boardData);
-    connection.send(fen + "|" + myOpp);
+    var updateJson = JSON.stringify({type: "updateGame", fen: fen, passSpace: enPassantSpace, opponent: myOpp});
+    connection.send(updateJson);
   }
 
   function DrawCheck(boardData) {
