@@ -81,7 +81,8 @@ wsServer.on("request", function(request) {
         } else {
           console.log("Move Sent");
           var obj = {
-            fen: messageJson.fen
+            fen: messageJson.fen,
+            pass: messageJson.passSpace
           };
           var updateGameJson = JSON.stringify({type:'updateGame', data: obj});
           connections[messageJson.opponent].sendUTF(updateGameJson);

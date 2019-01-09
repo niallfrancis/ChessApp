@@ -51,6 +51,7 @@ $(document).ready(function () {
     } else if (json.type === 'updateGame') {
       console.log(json.data.fen);
       boardData = GenerateFenBoard(json.data.fen);
+      enPassantSpace = json.data.pass;
       DrawPieces(boardData);
       DrawCheck(boardData);
       whiteTurn = !whiteTurn;
@@ -127,7 +128,7 @@ $(document).ready(function () {
   function SendBoardData(boardData) {
     //Turn board data to fen
     var fen = GetBoardFen(boardData);
-    var updateJson = JSON.stringify({type: "updateGame", fen: fen, opponent: myOpp});
+    var updateJson = JSON.stringify({type: "updateGame", fen: fen, passSpace: enPassantSpace, opponent: myOpp});
     connection.send(updateJson);
   }
 

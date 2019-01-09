@@ -16,7 +16,6 @@ function Piece(currentPos, colour, hasMoved) {
   this.colour = colour;
   this.pieceVal;
   Piece.prototype.ShowMoves = function(board) {};
-  Piece.prototype.ShowAttacks = function(board){};
   Piece.prototype.Move = function(targetSpace, board) {
     var tempPos = this.currentPos;
     enPassantSpace = null;
@@ -62,13 +61,6 @@ function Pawn(currentPos, colour, hasMoved) {
         movableSpaces.push(searchSpace);
       }
     }
-    return CheckByDiscovery(board, movableSpaces, this);
-  };
-
-  Pawn.prototype.ShowAttacks = function(board) {
-    var movableSpaces = [];
-    var moveDir = ((this.colour == "white") ? -1 : 1);
-
     searchSpace = parseInt(this.currentPos) + (moveDir * 10) + 1;
     if (SpaceContainsEnemy(board, this, searchSpace)) {
       movableSpaces.push(searchSpace);
@@ -87,7 +79,7 @@ function Pawn(currentPos, colour, hasMoved) {
         movableSpaces.push(searchSpace);
       }
     }
-    return movableSpaces;
+    return CheckByDiscovery(board, movableSpaces, this);
   };
   Pawn.prototype.Move = function(targetSpace, board) {
     var moveDir = ((this.colour == "white") ? -1 : 1);
@@ -131,7 +123,6 @@ function Knight(currentPos, colour, hasMoved) {
     }
     return CheckByDiscovery(board, movableSpaces, this);
   };
-  Knight.prototype.ShowAttacks = Knight.prototype.ShowMoves;
 }
 
 function Bishop(currentPos, colour, hasMoved) {
@@ -141,7 +132,6 @@ function Bishop(currentPos, colour, hasMoved) {
   Bishop.prototype.ShowMoves = function(board) {
     return DiagonalMovement(board, this);
   };
-  Bishop.prototype.ShowAttacks = Bishop.prototype.ShowMoves;
 }
 
 function Rook(currentPos, colour, hasMoved) {
@@ -151,7 +141,6 @@ function Rook(currentPos, colour, hasMoved) {
   Rook.prototype.ShowMoves = function(board) {
     return HorizontalVerticalMovement(board, this);
   };
-  Rook.prototype.ShowAttacks = Rook.prototype.ShowMoves;
 }
 
 function Queen(currentPos, colour, hasMoved) {
@@ -165,7 +154,6 @@ function Queen(currentPos, colour, hasMoved) {
 
     return movableSpaces;
   };
-  Queen.prototype.ShowAttacks = Queen.prototype.ShowMoves;
 }
 
 function King(currentPos, colour, hasMoved) {
@@ -214,7 +202,6 @@ function King(currentPos, colour, hasMoved) {
     }
     return nonCheckSpaces;
   };
-  King.prototype.ShowAttacks = King.prototype.ShowMoves;
 
   King.prototype.Move = function(targetSpace, board) {
     if (targetSpace - this.currentPos == 2) {
