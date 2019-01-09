@@ -16,6 +16,7 @@ $(document).ready(function () {
   // my name sent to the server
   var myName = false;
 
+  $("#board").hide();
 
 
   // open connection
@@ -46,6 +47,8 @@ $(document).ready(function () {
         myOpp = json.data.player2;
         iAmWhite = true;
       }
+      $("#board").show();
+      $("#lobby").hide();
       InitBoard();
       DrawPieces(boardData);
     } else if (json.type === 'updateGame') {
@@ -62,7 +65,9 @@ $(document).ready(function () {
   function updateUsers(userList) {
     users.empty();
     for (var i = 0; i < userList.length; i++) {
-      users.append('<li class="player" id="' + userList[i].id + '"><a href="#">' + userList[i].username + '</a></li>')
+      if (userList[i].username != myName) {
+        users.append('<li class="player" id="' + userList[i].id + '"><a href="#">' + userList[i].username + '</a></li>')
+      }
     }
   }
 
