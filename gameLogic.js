@@ -456,8 +456,70 @@ function CheckByDiscovery(board, moves, piece) {
 function CreateNewBoardData(whitePieces, blackPieces) {
 
   boardData = GenerateFenBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-  //boardData = GenerateFenBoard("rnbqkbnr/1pp1pppp/3p4/8/2PQ4/p4P2/PP1PN1PP/RNB1KB1R");
   return boardData;
+}
+
+function GetBoardFen(board) {
+  var fen = "";
+  var concurrentBlanks = 0;
+  for (var i = 0; i < board.length; i++) {
+
+    if ((i > 19 && i < 99) && (i % 10 == 9)) {
+      if (concurrentBlanks > 0) {
+        fen += concurrentBlanks;
+        concurrentBlanks = 0;
+      }
+      fen += "/"
+    }
+    if (board[i] != 99) {
+
+      if (board[i] instanceof Piece) {
+        if (concurrentBlanks > 0) {
+          fen += concurrentBlanks;
+          concurrentBlanks = 0;
+        }
+
+        var addition = "";
+
+        switch (board[i].pieceVal) {
+          case "Pawn":
+            addition = "p";
+            break;
+          case "Knight":
+            addition = "n";
+            break;
+          case "Bishop":
+            addition = "b";
+            break;
+          case "Rook":
+            addition = "r";
+            break;
+          case "Queen":
+            addition = "q";
+            break;
+          case "King":
+            addition = "k";
+            break;
+          default:
+
+        }
+
+        if (board[i].colour == "white") {
+          addition = addition.toUpperCase();
+        }
+
+        fen += addition;
+      } else {
+        concurrentBlanks++;
+        if (concurrentBlanks == 8) {
+          fen += concurrentBlanks;
+          concurrentBlanks = 0;
+        }
+      }
+    }
+  }
+
+  return fen;
 }
 
 function GenerateFenBoard(fen) {
