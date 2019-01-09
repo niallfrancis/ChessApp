@@ -8,6 +8,10 @@ $(document).ready(function () {
   var users = $('#users');
   var input = $('#input');
   var status = $('#status');
+  var board = $('#board');
+  var lobby = $('#lobby');
+  var infoText = $('#infoText');
+  var infoPanel = $('#infoPanel');
   var myId = null;
   var myOpp = null;
   var iAmWhite = false;
@@ -16,7 +20,8 @@ $(document).ready(function () {
   // my name sent to the server
   var myName = false;
 
-  $("#board").hide();
+  board.hide();
+  infoPanel.hide();
 
 
   // open connection
@@ -31,6 +36,7 @@ $(document).ready(function () {
     var json = JSON.parse(message.data);
     //New user connected to lobby
     if (json.type === 'colour') {
+      input.attr('disabled', 'disabled');
       status.text(myName + ': ').css('color', json.data.colour);
       updateUsers(json.data.users);
       myId = json.data.id;
@@ -47,8 +53,9 @@ $(document).ready(function () {
         myOpp = json.data.player2;
         iAmWhite = true;
       }
-      $("#board").show();
-      $("#lobby").hide();
+      board.show();
+      lobby.hide();
+      infoPanel.hide();
       InitBoard();
       DrawPieces(boardData);
     } else if (json.type === 'updateGame') {
@@ -58,6 +65,10 @@ $(document).ready(function () {
       DrawPieces(boardData);
       DrawCheck(boardData);
       whiteTurn = !whiteTurn;
+    } else if (json.type === 'opponentLeft') {
+      infoText.text("Opponent Left Game. Return to Lobby");
+      infoPanel.show();
+      console.log("test");
     }
 
   };
@@ -82,13 +93,12 @@ $(document).ready(function () {
       var jsonMsg = JSON.stringify({message: msg});
       connection.send(jsonMsg);
       $(this).val('');
+      infoPanel.hide();
       // disable the input field to make the user wait until server
       // sends back response
-      input.attr('disabled', 'disabled');
       // we know that the first message sent from a user their name
-      if (myName === false) {
+
         myName = msg;
-      }
     }
   });
 
@@ -128,6 +138,10 @@ $(document).ready(function () {
         selectedPiece = null;
       }
     }
+  });
+
+  $("#back").click(function(event) {
+    location.reload();
   });
 
   function SendBoardData(boardData) {

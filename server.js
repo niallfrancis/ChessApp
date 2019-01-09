@@ -14,6 +14,7 @@ wsServer = new WebSocketServer({
 });
 
 var users = [];
+var pairs = [];
 var connections = {};
 
 
@@ -41,30 +42,40 @@ wsServer.on("request", function(request) {
     if (message.type === 'utf8') {
     // first message sent by user is their name
      if (userName === false) {
+       var validName = true;
         // remember user name
-        userName = htmlEntities(messageJson.message);
-        var tempUser = {
-          username: userName,
-          id: connection.id
-        };
-        users.push(tempUser);
-
-        // get random color and send it back to the user
-        userColor = colors.shift();
-        var obj = {
-          users: users,
-          user: userName,
-          colour: userColor,
-          id: connection.id
-        };
-        var updateUserJson = JSON.stringify({type:'updateUsers', data: obj});
-        var colourJson = JSON.stringify({type:'colour', data: obj});
-        connection.sendUTF(colourJson);
-        for (var id in connections) {
-          connections[id].sendUTF(updateUserJson);
+        for (var i = 0; i < users.length; i++) {
+          if (users[i].username == messageJson.message) {
+            validName = false;
+            break;
+          }
         }
-        console.log((new Date()) + ' User is known as: ' + userName
-                    + ' with ' + obj.colour + ' color.');
+        if (validName) {
+          userName = htmlEntities(messageJson.message);
+          var tempUser = {
+            username: userName,
+            id: connection.id
+          };
+          users.push(tempUser);
+
+          // get random color and send it back to the user
+          userColor = colors.shift();
+          var obj = {
+            users: users,
+            user: userName,
+            colour: userColor,
+            id: connection.id
+          };
+          var updateUserJson = JSON.stringify({type:'updateUsers', data: obj});
+          var colourJson = JSON.stringify({type:'colour', data: obj});
+          connection.sendUTF(colourJson);
+          for (var id in connections) {
+            connections[id].sendUTF(updateUserJson);
+          }
+          console.log((new Date()) + ' User is known as: ' + userName
+                      + ' with ' + obj.colour + ' color.');
+        }
+
       } else {
         var type = messageJson.type;
 
@@ -75,6 +86,18 @@ wsServer.on("request", function(request) {
             player1: player1Id,
             player2: connection.id
           };
+
+          for (var i = 0; i < users.length; i++) {
+            if (users[i].id === player1Id || users[i].id === connection.id) {
+              users.splice(i, 1);
+              break;
+            }
+          }
+
+          pairs.push(obj);
+          for (var i = 0; i < pairs.length; i++) {
+            console.log(pairs[i].player1 + " " + pairs[i].player2);
+          }
           var newGameJson = JSON.stringify({type:'newGame', data: obj});
           connections[player1Id].sendUTF(newGameJson);
           connections[connection.id].sendUTF(newGameJson);
@@ -99,6 +122,24 @@ wsServer.on("request", function(request) {
       for (var i = 0; i < users.length; i++) {
         if (users[i].id === id) {
           users.splice(i, 1);
+          break;
+        }
+      }
+
+      var obj = {
+        users: users
+      };
+      var opponentLeft = JSON.stringify({type:'opponentLeft', data: obj});
+
+      for (var i = 0; i < pairs.length; i++) {
+        if (pairs[i].player1 === id) {
+          connections[pairs[i].player2].sendUTF(opponentLeft);
+          pairs.splice(i, 1);
+          break;
+        }
+        if (pairs[i].player2 === id) {
+          connections[pairs[i].player1].sendUTF(opponentLeft);
+          pairs.splice(i, 1);
           break;
         }
       }
