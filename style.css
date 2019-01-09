@@ -26,6 +26,21 @@
   background-color: lightblue;
   font-size: 20px;
 }
+
+#infoText{
+  position: relative;
+  text-align: center;
+  margin: auto;
+  margin-bottom: 3px;
+  width: 70%;
+}
+
+#infoPanel > div {
+  margin: auto;
+  width: 10%;
+  margin-bottom: 3px;
+}
+
 a {
   margin: auto;
   background-color: #90ce9a;
