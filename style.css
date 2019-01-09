@@ -13,6 +13,12 @@
     border-width: 5px;
 }
 
+#infoPanel {
+    width: 30%;
+    background-color: lightblue;
+    font-size: 20px;
+}
+
 .white.Pawn {
   content:url(images/whitePawn.png);
 }
