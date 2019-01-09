@@ -1,3 +1,4 @@
+
 #lobby {
     margin: auto;
     width:10%;
@@ -27,7 +28,7 @@
 }
 a {
   margin: auto;
-  background-color: #f44336;
+  background-color: #90ce9a;
   color: white;
   padding: 14px 25px;
   text-align: center;
@@ -39,6 +40,7 @@ a {
 
 body {
   font-family: sans-serif;
+  background-color: #c6d6ef;
 }
 
 h1 {
