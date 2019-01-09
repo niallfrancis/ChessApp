@@ -1,33 +1,34 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="gameLogic.js"></script>
-    <script src="gameFlow.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <title>ChessApp</title>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="gameLogic.js"></script>
+  <script src="gameFlow.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>ChessApp</title>
 </head>
 
 <body>
-    <h1 class="title">Niall's Chess App</h1>
-    <div id="infoPanel">
-      <p id="infoText">Default Info</p>
-      <button id="back" type="button">Back</button>
+  <h1 class="title">Chesstastic</h1>
+  <div id="infoPanel">
+    <p id="infoText">Default Info</p>
+    <button id="back" type="button">Back</button>
+  </div>
+  <div id="board">
+  </div>
+  <div id="lobby">
+    <div id="players">
+      <ul id="users">
+      </ul>
     </div>
-    <div id="board">
+    <div>
+      <span id="status">Connecting...</span>
+      <input type="text" id="input" disabled="disabled" />
     </div>
-    <div id="lobby">
-      <div id="players">
-        <ul id="users">
-        </ul>
-      </div>
-      <div>
-        <span id="status">Connecting...</span>
-        <input type="text" id="input" disabled="disabled" />
-      </div>
-    </div>
+  </div>
 </body>
 
 </html>
