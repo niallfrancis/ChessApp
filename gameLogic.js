@@ -10,6 +10,35 @@ $(document).ready(function() {
 
 });
 
+factory = {
+  create: function(piece, pos, colour, hasmoved) {
+    var p;
+
+    switch (piece) {
+      case "Pawn":
+        p = new Pawn(pos, colour, hasmoved);
+        break;
+      case "Knight":
+        p = new Knight(pos, colour, hasmoved);
+        break;
+      case "Bishop":
+        p = new Bishop(pos, colour, hasmoved);
+        break;
+      case "Rook":
+        p = new Rook(pos, colour, hasmoved);
+        break;
+      case "Queen":
+        p = new Queen(pos, colour, hasmoved);
+        break;
+      case "King":
+        p = new King(pos, colour, hasmoved);
+        break;
+      default:
+    }
+    return p;
+  }
+}
+
 function Piece(currentPos, colour, hasMoved) {
   this.currentPos = currentPos;
   this.hasMoved = hasMoved;
@@ -535,52 +564,52 @@ function GenerateFenBoard(fen) {
       } else {
         switch (currentChar) {
           case "p":
-            var temp = new Pawn(currentSquare, "black", moved);
+            var temp = factory.create("Pawn", currentSquare, "black", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "P":
-            var temp = new Pawn(currentSquare, "white", moved);
+            var temp = factory.create("Pawn", currentSquare, "white", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "n":
-            var temp = new Knight(currentSquare, "black", moved);
+            var temp = factory.create("Knight", currentSquare, "black", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "N":
-            var temp = new Knight(currentSquare, "white", moved);
+            var temp = factory.create("Knight", currentSquare, "white", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "b":
-            var temp = new Bishop(currentSquare, "black", moved);
+            var temp = factory.create("Bishop", currentSquare, "black", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "B":
-            var temp = new Bishop(currentSquare, "white", moved);
+            var temp = factory.create("Bishop", currentSquare, "white", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "r":
-            var temp = new Rook(currentSquare, "black", moved);
+            var temp = factory.create("Rook", currentSquare, "black", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "R":
-            var temp = new Rook(currentSquare, "white", moved);
+            var temp = factory.create("Rook", currentSquare, "white", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "q":
-            var temp = new Queen(currentSquare, "black", moved);
+            var temp = factory.create("Queen", "black", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "Q":
-            var temp = new Queen(currentSquare, "white", moved);
+            var temp = factory.create("Queen", currentSquare, "white", moved);
             boardSpace[currentSquare] = temp;
             break;
           case "k":
-            var tempKing = new King(currentSquare, "black", moved);
+            var tempKing = factory.create("King", currentSquare, "black", moved);
             boardSpace[currentSquare] = tempKing;
             blackKing = tempKing;
             break;
           case "K":
-            var tempKing = new King(currentSquare, "white", moved);
+            var tempKing = factory.create("King", currentSquare, "white", moved);
             boardSpace[currentSquare] = tempKing;
             whiteKing = tempKing;
             break;
