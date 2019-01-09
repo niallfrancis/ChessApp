@@ -38,12 +38,12 @@ $(document).ready(function () {
     if (json.type === 'colour') {
       input.attr('disabled', 'disabled');
       status.text(myName + ': ').css('color', json.data.colour);
-      updateUsers(json.data.users);
+      UpdateUsers(json.data.users);
       myId = json.data.id;
 
     } else if (json.type === 'updateUsers') {
       var obj = json.data;
-      updateUsers(obj.users);
+      UpdateUsers(obj.users);
     } else if (json.type === 'newGame') {
 
       if (json.data.player1 != myId) {
@@ -68,12 +68,11 @@ $(document).ready(function () {
     } else if (json.type === 'opponentLeft') {
       infoText.text("Opponent Left Game. Return to Lobby");
       infoPanel.show();
-      console.log("test");
     }
 
   };
 
-  function updateUsers(userList) {
+  function UpdateUsers(userList) {
     users.empty();
     for (var i = 0; i < userList.length; i++) {
       if (userList[i].username != myName) {
@@ -82,6 +81,10 @@ $(document).ready(function () {
     }
   }
 
+  function DeclareCheckmate(colour) {
+    infoText.text("Checkmate for " + colour + "! Please exit to lobby");
+    infoPanel.show();
+  }
 
   input.keydown(function(e) {
     if (e.keyCode === 13) {
@@ -157,6 +160,7 @@ $(document).ready(function () {
         $(".square#" + blackKing.currentPos + " img").addClass('check');
         if (CheckForCheckmate(boardData, "white", blackKing)) {
           $(".square#" + blackKing.currentPos + " img").addClass('mate');
+          DeclareCheckmate("white");
         }
       } else {
         $(".square#" + blackKing.currentPos + " img").removeClass('check');
@@ -166,6 +170,7 @@ $(document).ready(function () {
         $(".square#" + whiteKing.currentPos + " img").addClass('check');
         if (CheckForCheckmate(boardData,"black", whiteKing)) {
           $(".square#" + blackKing.currentPos + " img").addClass('mate');
+          DeclareCheckmate("black");
         }
       } else {
         $(".square#" + whiteKing.currentPos + " img").removeClass('check');
