@@ -525,7 +525,7 @@ function GenerateFenBoard(fen) {
 
   for (var i = 0; i < fen.length; i += 2) {
     var currentChar = fen.charAt(i+1);
-    var moved = ((i == "u" || i == "U") ? true : false);
+    var moved = ((fen.charAt(i) == "u" || fen.charAt(i) == "U") ? false : true);
     if (currentChar != "/") {
       if (!isNaN(currentChar)) {
         for (var j = 0; j < parseInt(currentChar, 10); j++) {
